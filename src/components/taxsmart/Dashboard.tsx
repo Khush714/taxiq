@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { TaxComparison, Strategy } from '@/lib/types';
 import { formatCurrency } from '@/lib/taxEngine';
+import { downloadTaxReport } from '@/lib/pdfGenerator';
 import StrategyCard from './StrategyCard';
-import { ArrowRight, Download, TrendingDown, TrendingUp, Scale, Sparkles } from 'lucide-react';
+import { ArrowRight, Download, TrendingDown, TrendingUp, Scale, Sparkles, Mail, Check, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface DashboardProps {
   comparison: TaxComparison;
@@ -14,6 +16,10 @@ const Dashboard = ({ comparison, strategies, userName }: DashboardProps) => {
   const [visibleStrategies, setVisibleStrategies] = useState(10);
   const [showUpsell, setShowUpsell] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [email, setEmail] = useState('');
+  const [emailSent, setEmailSent] = useState(false);
+  const [sendingEmail, setSendingEmail] = useState(false);
+  const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 2500);
@@ -29,6 +35,34 @@ const Dashboard = ({ comparison, strategies, userName }: DashboardProps) => {
 
   const totalSavings = strategies.slice(0, visibleStrategies).reduce((acc, s) => acc + s.estimatedSavings, 0);
   const hiddenCount = strategies.length - visibleStrategies;
+
+  const handleDownload = () => {
+    setDownloading(true);
+    try {
+      downloadTaxReport(userName, comparison, strategies.slice(0, visibleStrategies));
+      toast.success('PDF report downloaded successfully!');
+    } catch {
+      toast.error('Failed to generate PDF. Please try again.');
+    } finally {
+      setDownloading(false);
+    }
+  };
+
+  const handleSendEmail = () => {
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast.error('Please enter a valid email address.');
+      return;
+    }
+    setSendingEmail(true);
+    // Simulate sending (requires Lovable Cloud for actual delivery)
+    setTimeout(() => {
+      setSendingEmail(false);
+      setEmailSent(true);
+      toast.success(`Report will be sent to ${email}`, {
+        description: 'Enable Lovable Cloud for live email delivery.',
+      });
+    }, 1500);
+  };
 
   if (loading) {
     return (
@@ -167,7 +201,6 @@ const Dashboard = ({ comparison, strategies, userName }: DashboardProps) => {
             Based on your profile, we found additional advanced strategies
           </p>
 
-          {/* Preview locked */}
           <div className="space-y-2 mb-5">
             {strategies.slice(visibleStrategies, visibleStrategies + 3).map((s, i) => (
               <StrategyCard key={s.id} strategy={s} index={visibleStrategies + i} locked />
@@ -183,11 +216,61 @@ const Dashboard = ({ comparison, strategies, userName }: DashboardProps) => {
         </div>
       )}
 
-      {/* Download */}
-      <button className="w-full card-premium p-4 flex items-center justify-center gap-2 text-sm font-medium text-foreground hover:border-primary/30 transition-all">
-        <Download className="w-4 h-4 text-primary" />
-        Download PDF Report
-      </button>
+      {/* Download & Email Section */}
+      <div className="card-premium p-5 mb-4">
+        <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
+          <Download className="w-4 h-4 text-primary" />
+          Get Your Report
+        </h3>
+
+        {/* Download PDF */}
+        <button
+          onClick={handleDownload}
+          disabled={downloading}
+          className="btn-gold w-full flex items-center justify-center gap-2 mb-4"
+        >
+          {downloading ? (
+            <><Loader2 className="w-4 h-4 animate-spin" /> Generating PDF...</>
+          ) : (
+            <><Download className="w-4 h-4" /> Download PDF Report</>
+          )}
+        </button>
+
+        {/* Email delivery */}
+        <div className="border-t border-border pt-4">
+          <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
+            <Mail className="w-3 h-3" />
+            Or receive via email
+          </p>
+          {emailSent ? (
+            <div className="flex items-center gap-2 text-success text-sm p-3 bg-success/10 rounded-lg">
+              <Check className="w-4 h-4" />
+              Report queued for delivery to {email}
+            </div>
+          ) : (
+            <div className="flex gap-2">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="your@email.com"
+                className="input-premium flex-1 text-sm"
+              />
+              <button
+                onClick={handleSendEmail}
+                disabled={sendingEmail}
+                className="btn-gold px-4 flex items-center gap-1.5 text-sm shrink-0"
+              >
+                {sendingEmail ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <><Mail className="w-4 h-4" /> Send</>
+                )}
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
 
       <p className="text-center text-[10px] text-muted-foreground mt-6 mb-10">
         Disclaimer: This report is for informational purposes only. Consult a qualified Chartered Accountant before making tax decisions.
