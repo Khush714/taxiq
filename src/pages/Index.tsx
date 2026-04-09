@@ -82,7 +82,7 @@ const Index = () => {
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 py-6">
+      <main className="max-w-4xl mx-auto px-4 py-6 relative z-10">
         {view === 'landing' && (
           <LandingPage onStart={() => setView('form')} />
         )}
