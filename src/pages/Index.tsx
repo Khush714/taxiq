@@ -12,6 +12,7 @@ import RiskStep from '@/components/taxsmart/RiskStep';
 import PaywallPage from '@/components/taxsmart/PaywallPage';
 import Dashboard from '@/components/taxsmart/Dashboard';
 import { Sparkles } from 'lucide-react';
+import AnimatedBackground from '@/components/taxsmart/AnimatedBackground';
 
 const defaultProfile: UserProfile = {
   fullName: '',
