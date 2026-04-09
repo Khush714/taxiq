@@ -1,5 +1,6 @@
 import { DeductionDetails } from '@/lib/types';
 import { Receipt, ChevronRight, ChevronLeft, Info } from 'lucide-react';
+import CurrencyInput from './CurrencyInput';
 
 interface DeductionsStepProps {
   deductions: DeductionDetails;
@@ -48,16 +49,12 @@ const DeductionsStep = ({ deductions, onUpdate, onNext, onBack, isSenior }: Dedu
               <label className="block text-sm font-medium text-foreground">{f.label}</label>
               <span className="text-[10px] text-muted-foreground">{f.limit}</span>
             </div>
-            <input
-              type="number"
-              value={deductions[f.key] || ''}
-              onChange={(e) => {
-                let val = parseFloat(e.target.value) || 0;
-                if (f.max) val = Math.min(val, f.max);
-                onUpdate({ ...deductions, [f.key]: val });
-              }}
-              className="input-premium w-full"
+            <CurrencyInput
+              value={deductions[f.key]}
+              onChange={(val) => onUpdate({ ...deductions, [f.key]: val })}
+              className="w-full"
               placeholder="₹"
+              max={f.max}
             />
             {f.max && deductions[f.key] >= f.max && (
               <p className="text-primary text-[10px] mt-0.5">✓ Maximum limit reached</p>
