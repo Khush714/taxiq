@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { UserProfile, IncomeDetails, DeductionDetails, AdvancedProfile, RiskPreference, TaxComparison, Strategy } from '@/lib/types';
 import { compareTaxRegimes } from '@/lib/taxEngine';
 import { generateStrategies } from '@/lib/strategyEngine';
+import LandingPage from '@/components/taxsmart/LandingPage';
 import StepProgress from '@/components/taxsmart/StepProgress';
 import ProfileStep from '@/components/taxsmart/ProfileStep';
 import IncomeStep from '@/components/taxsmart/IncomeStep';
@@ -38,11 +39,11 @@ const defaultAdvanced: AdvancedProfile = {
   hasBusinessIncome: false, spouseIncome: 0,
 };
 
-type AppView = 'form' | 'paywall' | 'dashboard';
+type AppView = 'landing' | 'form' | 'paywall' | 'dashboard';
 
 const Index = () => {
   const [step, setStep] = useState(0);
-  const [view, setView] = useState<AppView>('form');
+  const [view, setView] = useState<AppView>('landing');
   const [profile, setProfile] = useState<UserProfile>(defaultProfile);
   const [income, setIncome] = useState<IncomeDetails>(defaultIncome);
   const [deductions, setDeductions] = useState<DeductionDetails>(defaultDeductions);
@@ -80,6 +81,10 @@ const Index = () => {
       </header>
 
       <main className="max-w-4xl mx-auto px-4 py-6">
+        {view === 'landing' && (
+          <LandingPage onStart={() => setView('form')} />
+        )}
+
         {view === 'form' && (
           <>
             <StepProgress currentStep={step} />

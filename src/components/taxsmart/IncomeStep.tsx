@@ -1,5 +1,6 @@
 import { IncomeDetails } from '@/lib/types';
 import { IndianRupee, ChevronRight, ChevronLeft } from 'lucide-react';
+import CurrencyInput from './CurrencyInput';
 
 interface IncomeStepProps {
   income: IncomeDetails;
@@ -9,8 +10,8 @@ interface IncomeStepProps {
 }
 
 const fields: { key: keyof IncomeDetails; label: string; placeholder: string }[] = [
-  { key: 'salary', label: 'Annual Salary (CTC)', placeholder: '₹ e.g. 2500000' },
-  { key: 'bonus', label: 'Bonus / Variable Pay', placeholder: '₹ e.g. 500000' },
+  { key: 'salary', label: 'Annual Salary (CTC)', placeholder: '₹ e.g. 25,00,000' },
+  { key: 'bonus', label: 'Bonus / Variable Pay', placeholder: '₹ e.g. 5,00,000' },
   { key: 'capitalGainsSTCG', label: 'Short-Term Capital Gains', placeholder: '₹' },
   { key: 'capitalGainsLTCG', label: 'Long-Term Capital Gains', placeholder: '₹' },
   { key: 'rentalIncome', label: 'Rental Income', placeholder: '₹' },
@@ -36,11 +37,10 @@ const IncomeStep = ({ income, onUpdate, onNext, onBack }: IncomeStepProps) => {
         {fields.map(f => (
           <div key={f.key}>
             <label className="block text-sm font-medium mb-1.5 text-foreground">{f.label}</label>
-            <input
-              type="number"
-              value={income[f.key] || ''}
-              onChange={(e) => onUpdate({ ...income, [f.key]: parseFloat(e.target.value) || 0 })}
-              className="input-premium w-full"
+            <CurrencyInput
+              value={income[f.key]}
+              onChange={(val) => onUpdate({ ...income, [f.key]: val })}
+              className="w-full"
               placeholder={f.placeholder}
             />
           </div>

@@ -1,5 +1,6 @@
 import { AdvancedProfile } from '@/lib/types';
 import { Settings, ChevronRight, ChevronLeft } from 'lucide-react';
+import CurrencyInput from './CurrencyInput';
 
 interface AdvancedStepProps {
   advanced: AdvancedProfile;
@@ -66,11 +67,10 @@ const AdvancedStep = ({ advanced, onUpdate, onNext, onBack }: AdvancedStepProps)
 
         <div>
           <label className="block text-sm font-medium mb-1.5 text-foreground">Spouse's Annual Income (if applicable)</label>
-          <input
-            type="number"
-            value={advanced.spouseIncome || ''}
-            onChange={(e) => onUpdate({ ...advanced, spouseIncome: parseFloat(e.target.value) || 0 })}
-            className="input-premium w-full"
+          <CurrencyInput
+            value={advanced.spouseIncome}
+            onChange={(val) => onUpdate({ ...advanced, spouseIncome: val })}
+            className="w-full"
             placeholder="₹"
           />
         </div>
