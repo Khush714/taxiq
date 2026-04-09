@@ -18,8 +18,8 @@ const features = [
 ];
 
 const testimonials = [
-  { name: 'Rajesh M.', role: 'CTO, Bangalore', text: 'Saved ₹3.2L this year. Better than my CA's advice.', stars: 5 },
-  { name: 'Priya S.', role: 'Consultant, Mumbai', text: 'The HUF strategy alone saved me ₹1.8L. Incredible tool.', stars: 5 },
+  { name: 'Rajesh M.', role: 'CTO, Bangalore', text: 'Saved 3.2L this year. Better than my CA advice.', stars: 5 },
+  { name: 'Priya S.', role: 'Consultant, Mumbai', text: 'The HUF strategy alone saved me 1.8L. Incredible tool.', stars: 5 },
   { name: 'Amit K.', role: 'Founder, Delhi', text: 'Worth every rupee. The regime comparison is spot on.', stars: 5 },
 ];
 
