@@ -47,6 +47,13 @@ export interface AdvancedProfile {
 
 export type RiskPreference = 'conservative' | 'moderate' | 'aggressive';
 
+export interface SlabDetail {
+  range: string;
+  rate: number;
+  taxableAmount: number;
+  tax: number;
+}
+
 export interface TaxResult {
   regime: 'old' | 'new';
   grossIncome: number;
@@ -56,6 +63,12 @@ export interface TaxResult {
   surcharge: number;
   cess: number;
   totalTax: number;
+  slabBreakdown: SlabDetail[];
+  deductionBreakdown: Record<string, number>;
+  rebate87A: number;
+  capitalGainsTax: number;
+  ltcgTax: number;
+  stcgTax: number;
 }
 
 export interface TaxComparison {
