@@ -13,118 +13,298 @@ interface DashboardProps {
   userName: string;
 }
 
+const StepNumber = ({ num, active = true }: { num: number; active?: boolean }) => (
+  <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+    active ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
+  }`}>
+    {num}
+  </div>
+);
+
+const StepConnector = () => (
+  <div className="w-7 flex justify-center">
+    <div className="w-0.5 h-4 bg-primary/20" />
+  </div>
+);
+
 const RegimeDetail = ({ result, label }: { result: TaxResult; label: string }) => {
-  const [showDeductions, setShowDeductions] = useState(false);
+  const [expandedStep, setExpandedStep] = useState<number | null>(null);
+
+  const toggleStep = (step: number) => {
+    setExpandedStep(expandedStep === step ? null : step);
+  };
+
+  // Calculate slab tax (before rebate, before cap gains)
+  const slabTax = result.slabBreakdown.reduce((sum, s) => sum + s.tax, 0);
+
+  // Tax after rebate (on slab income only)
+  const taxAfterRebate = Math.max(0, slabTax - result.rebate87A);
+
+  // Total base = slab tax after rebate + capital gains tax
+  const totalBeforeSurcharge = taxAfterRebate + result.capitalGainsTax;
 
   return (
-    <div className="space-y-3 animate-fade-in">
-      {/* Income & Deductions */}
-      <div className="space-y-2">
-        <div className="flex justify-between text-xs">
-          <span className="text-muted-foreground">Gross Income</span>
-          <span className="font-medium text-foreground">{formatCurrency(result.grossIncome)}</span>
+    <div className="space-y-0 animate-fade-in">
+      {/* Step 1: Gross Income */}
+      <div className="flex gap-3">
+        <div className="flex flex-col items-center">
+          <StepNumber num={1} />
+          <StepConnector />
         </div>
+        <div className="flex-1 pb-3">
+          <p className="text-xs font-semibold text-foreground mb-1">Step 1: Gross Total Income</p>
+          <p className="text-xs text-muted-foreground mb-2">Sum of all income sources before any deductions</p>
+          <div className="bg-secondary/50 rounded-lg p-3">
+            <div className="flex justify-between text-sm font-semibold">
+              <span>Gross Total Income</span>
+              <span className="text-foreground">{formatCurrency(result.grossIncome)}</span>
+            </div>
+          </div>
+        </div>
+      </div>
 
-        <div>
-          <button
-            onClick={() => setShowDeductions(!showDeductions)}
-            className="flex justify-between w-full text-xs items-center"
-          >
-            <span className="text-muted-foreground flex items-center gap-1">
-              Total Deductions
-              {showDeductions ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-            </span>
-            <span className="font-medium text-success">-{formatCurrency(result.totalDeductions)}</span>
-          </button>
-          {showDeductions && (
-            <div className="ml-3 mt-1 space-y-1 border-l-2 border-primary/20 pl-3 animate-fade-in">
-              {Object.entries(result.deductionBreakdown)
-                .filter(([, v]) => v > 0)
-                .map(([key, val]) => (
-                  <div key={key} className="flex justify-between text-[11px]">
-                    <span className="text-muted-foreground">{key}</span>
-                    <span className="text-success">₹{val.toLocaleString('en-IN')}</span>
+      {/* Step 2: Deductions */}
+      <div className="flex gap-3">
+        <div className="flex flex-col items-center">
+          <StepNumber num={2} />
+          <StepConnector />
+        </div>
+        <div className="flex-1 pb-3">
+          <p className="text-xs font-semibold text-foreground mb-1">Step 2: Deductions</p>
+          <p className="text-xs text-muted-foreground mb-2">
+            {label === 'Old Regime'
+              ? 'Deductions under 80C, 80D, 24(b), NPS, and standard deduction'
+              : 'Only standard deduction of ₹75,000 allowed under New Regime'}
+          </p>
+          <div className="bg-secondary/50 rounded-lg p-3">
+            <button
+              onClick={() => toggleStep(2)}
+              className="flex justify-between w-full text-sm font-semibold items-center"
+            >
+              <span className="flex items-center gap-1">
+                Total Deductions
+                {expandedStep === 2 ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+              </span>
+              <span className="text-success">-{formatCurrency(result.totalDeductions)}</span>
+            </button>
+            {expandedStep === 2 && (
+              <div className="mt-2 pt-2 border-t border-border space-y-1.5 animate-fade-in">
+                {Object.entries(result.deductionBreakdown)
+                  .filter(([, v]) => v > 0)
+                  .map(([key, val]) => (
+                    <div key={key} className="flex justify-between text-[11px]">
+                      <span className="text-muted-foreground">{key}</span>
+                      <span className="text-success">₹{val.toLocaleString('en-IN')}</span>
+                    </div>
+                  ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Step 3: Taxable Income */}
+      <div className="flex gap-3">
+        <div className="flex flex-col items-center">
+          <StepNumber num={3} />
+          <StepConnector />
+        </div>
+        <div className="flex-1 pb-3">
+          <p className="text-xs font-semibold text-foreground mb-1">Step 3: Net Taxable Income</p>
+          <p className="text-xs text-muted-foreground mb-2">Gross Income minus Deductions (excluding capital gains taxed separately)</p>
+          <div className="bg-secondary/50 rounded-lg p-3">
+            <div className="text-[11px] text-muted-foreground space-y-1 mb-2">
+              <div className="flex justify-between">
+                <span>Gross Income</span>
+                <span>{formatCurrency(result.grossIncome)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>− Deductions</span>
+                <span className="text-success">-{formatCurrency(result.totalDeductions)}</span>
+              </div>
+            </div>
+            <div className="flex justify-between text-sm font-semibold border-t border-border pt-2">
+              <span>Net Taxable Income</span>
+              <span className="text-foreground">{formatCurrency(result.taxableIncome)}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Step 4: Slab-wise Tax */}
+      <div className="flex gap-3">
+        <div className="flex flex-col items-center">
+          <StepNumber num={4} />
+          <StepConnector />
+        </div>
+        <div className="flex-1 pb-3">
+          <p className="text-xs font-semibold text-foreground mb-1">Step 4: Tax on Slab Rates</p>
+          <p className="text-xs text-muted-foreground mb-2">
+            Apply {label === 'Old Regime' ? 'Old' : 'New'} Regime tax slabs to your taxable income
+          </p>
+          <div className="bg-secondary/50 rounded-lg p-3">
+            <button
+              onClick={() => toggleStep(4)}
+              className="flex justify-between w-full text-sm font-semibold items-center"
+            >
+              <span className="flex items-center gap-1">
+                Slab-wise Breakdown
+                {expandedStep === 4 ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+              </span>
+              <span>{formatCurrency(slabTax)}</span>
+            </button>
+            {expandedStep === 4 && (
+              <div className="mt-2 pt-2 border-t border-border space-y-1.5 animate-fade-in">
+                {result.slabBreakdown.map((slab, i) => (
+                  <div key={i} className="flex justify-between text-[11px]">
+                    <span className="text-muted-foreground">
+                      {slab.range} @ {slab.rate}%
+                      {slab.taxableAmount > 0 && (
+                        <span className="text-muted-foreground/60 ml-1">
+                          (on ₹{slab.taxableAmount.toLocaleString('en-IN')})
+                        </span>
+                      )}
+                    </span>
+                    <span className={`font-medium ${slab.tax > 0 ? 'text-foreground' : 'text-muted-foreground'}`}>
+                      ₹{slab.tax.toLocaleString('en-IN')}
+                    </span>
                   </div>
                 ))}
-            </div>
-          )}
-        </div>
-
-        <div className="flex justify-between text-xs font-semibold border-t border-border pt-2">
-          <span className="text-foreground">Taxable Income</span>
-          <span className="text-foreground">{formatCurrency(result.taxableIncome)}</span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Slab-wise Breakdown */}
-      <div className="bg-secondary/50 rounded-lg p-3">
-        <p className="text-[11px] font-semibold text-foreground mb-2">Slab-wise Tax Calculation</p>
-        <div className="space-y-1.5">
-          {result.slabBreakdown.map((slab, i) => (
-            <div key={i} className="flex justify-between text-[11px]">
-              <span className="text-muted-foreground">
-                {slab.range} @ {slab.rate}%
-              </span>
-              <span className={`font-medium ${slab.tax > 0 ? 'text-foreground' : 'text-muted-foreground'}`}>
-                ₹{slab.tax.toLocaleString('en-IN')}
-              </span>
+      {/* Step 5: Rebate (if applicable) */}
+      {result.rebate87A > 0 && (
+        <div className="flex gap-3">
+          <div className="flex flex-col items-center">
+            <StepNumber num={5} />
+            <StepConnector />
+          </div>
+          <div className="flex-1 pb-3">
+            <p className="text-xs font-semibold text-foreground mb-1">Step 5: Rebate under Section 87A</p>
+            <p className="text-xs text-muted-foreground mb-2">
+              {label === 'Old Regime'
+                ? 'If taxable income ≤ ₹5L, rebate up to ₹12,500'
+                : 'If taxable income ≤ ₹7L, rebate up to ₹25,000'}
+            </p>
+            <div className="bg-success/5 border border-success/20 rounded-lg p-3">
+              <div className="flex justify-between text-sm font-semibold">
+                <span className="text-success">Rebate u/s 87A</span>
+                <span className="text-success">-₹{result.rebate87A.toLocaleString('en-IN')}</span>
+              </div>
+              <div className="flex justify-between text-[11px] text-muted-foreground mt-1">
+                <span>Tax after rebate</span>
+                <span>{formatCurrency(taxAfterRebate)}</span>
+              </div>
             </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Capital Gains */}
-      {result.capitalGainsTax > 0 && (
-        <div className="bg-secondary/50 rounded-lg p-3">
-          <p className="text-[11px] font-semibold text-foreground mb-2">Capital Gains Tax</p>
-          <div className="space-y-1.5">
-            {result.stcgTax > 0 && (
-              <div className="flex justify-between text-[11px]">
-                <span className="text-muted-foreground">STCG @ 20%</span>
-                <span className="font-medium text-foreground">₹{result.stcgTax.toLocaleString('en-IN')}</span>
-              </div>
-            )}
-            {result.ltcgTax > 0 && (
-              <div className="flex justify-between text-[11px]">
-                <span className="text-muted-foreground">LTCG @ 12.5% (above ₹1.25L)</span>
-                <span className="font-medium text-foreground">₹{result.ltcgTax.toLocaleString('en-IN')}</span>
-              </div>
-            )}
           </div>
         </div>
       )}
 
-      {/* Summary */}
-      <div className="space-y-2 pt-1">
-        {result.rebate87A > 0 && (
-          <div className="flex justify-between text-xs">
-            <span className="text-success">Rebate u/s 87A</span>
-            <span className="font-medium text-success">-₹{result.rebate87A.toLocaleString('en-IN')}</span>
+      {/* Step 5/6: Capital Gains Tax */}
+      {result.capitalGainsTax > 0 && (
+        <div className="flex gap-3">
+          <div className="flex flex-col items-center">
+            <StepNumber num={result.rebate87A > 0 ? 6 : 5} />
+            <StepConnector />
           </div>
-        )}
-        <div className="flex justify-between text-xs">
-          <span className="text-muted-foreground">Income Tax</span>
-          <span className="font-medium text-foreground">{formatCurrency(result.baseTax)}</span>
-        </div>
-        {result.surcharge > 0 && (
-          <div className="flex justify-between text-xs">
-            <span className="text-muted-foreground">Surcharge</span>
-            <span className="font-medium text-foreground">{formatCurrency(result.surcharge)}</span>
+          <div className="flex-1 pb-3">
+            <p className="text-xs font-semibold text-foreground mb-1">
+              Step {result.rebate87A > 0 ? 6 : 5}: Capital Gains Tax (Special Rates)
+            </p>
+            <p className="text-xs text-muted-foreground mb-2">
+              Capital gains are taxed at flat rates, not through slabs
+            </p>
+            <div className="bg-secondary/50 rounded-lg p-3 space-y-1.5">
+              {result.stcgTax > 0 && (
+                <div className="flex justify-between text-[11px]">
+                  <span className="text-muted-foreground">STCG @ 20%</span>
+                  <span className="font-medium">₹{result.stcgTax.toLocaleString('en-IN')}</span>
+                </div>
+              )}
+              {result.ltcgTax > 0 && (
+                <div className="flex justify-between text-[11px]">
+                  <span className="text-muted-foreground">LTCG @ 12.5% (above ₹1.25L exemption)</span>
+                  <span className="font-medium">₹{result.ltcgTax.toLocaleString('en-IN')}</span>
+                </div>
+              )}
+              <div className="flex justify-between text-xs font-semibold border-t border-border pt-1.5">
+                <span>Capital Gains Tax</span>
+                <span>{formatCurrency(result.capitalGainsTax)}</span>
+              </div>
+            </div>
           </div>
-        )}
-        <div className="flex justify-between text-xs">
-          <span className="text-muted-foreground">Health & Education Cess (4%)</span>
-          <span className="font-medium text-foreground">{formatCurrency(result.cess)}</span>
         </div>
-        <div className="border-t border-border pt-2 flex justify-between">
-          <span className="text-sm font-semibold text-foreground">Total Tax Payable</span>
-          <span className="text-sm font-bold gold-gradient-text">{formatCurrency(result.totalTax)}</span>
-        </div>
-      </div>
+      )}
+
+      {/* Step: Surcharge + Cess */}
+      {(() => {
+        const stepNum = 4 + (result.rebate87A > 0 ? 1 : 0) + (result.capitalGainsTax > 0 ? 1 : 0) + 1;
+        return (
+          <div className="flex gap-3">
+            <div className="flex flex-col items-center">
+              <StepNumber num={stepNum} />
+              <StepConnector />
+            </div>
+            <div className="flex-1 pb-3">
+              <p className="text-xs font-semibold text-foreground mb-1">
+                Step {stepNum}: Surcharge & Health Education Cess
+              </p>
+              <p className="text-xs text-muted-foreground mb-2">
+                Surcharge on high incomes + 4% cess on total tax
+              </p>
+              <div className="bg-secondary/50 rounded-lg p-3 space-y-1.5">
+                <div className="flex justify-between text-[11px]">
+                  <span className="text-muted-foreground">Tax before surcharge & cess</span>
+                  <span>{formatCurrency(totalBeforeSurcharge)}</span>
+                </div>
+                {result.surcharge > 0 && (
+                  <div className="flex justify-between text-[11px]">
+                    <span className="text-muted-foreground">+ Surcharge</span>
+                    <span className="font-medium">{formatCurrency(result.surcharge)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between text-[11px]">
+                  <span className="text-muted-foreground">+ Health & Education Cess (4%)</span>
+                  <span className="font-medium">{formatCurrency(result.cess)}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* Final Step: Total Tax */}
+      {(() => {
+        const finalStep = 4 + (result.rebate87A > 0 ? 1 : 0) + (result.capitalGainsTax > 0 ? 1 : 0) + 2;
+        return (
+          <div className="flex gap-3">
+            <div className="flex flex-col items-center">
+              <StepNumber num={finalStep} />
+            </div>
+            <div className="flex-1">
+              <p className="text-xs font-semibold text-foreground mb-1">
+                Step {finalStep}: Total Tax Payable
+              </p>
+              <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-semibold text-foreground">Total Tax Payable</span>
+                  <span className="text-lg font-bold gold-gradient-text">{formatCurrency(result.totalTax)}</span>
+                </div>
+                <p className="text-[10px] text-muted-foreground mt-1">
+                  Effective Tax Rate: {result.grossIncome > 0 ? ((result.totalTax / result.grossIncome) * 100).toFixed(2) : '0.00'}%
+                </p>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 };
-
 const Dashboard = ({ comparison, strategies, userName }: DashboardProps) => {
   const [visibleStrategies, setVisibleStrategies] = useState(10);
   const [showUpsell, setShowUpsell] = useState(false);
