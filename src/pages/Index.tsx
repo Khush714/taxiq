@@ -127,6 +127,7 @@ const Index = () => {
             comparison={comparison}
             strategies={strategies}
             userName={profile.fullName}
+            income={income}
           />
         )}
       </main>

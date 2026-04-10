@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
-import { TaxComparison, Strategy, TaxResult } from '@/lib/types';
+import { TaxComparison, Strategy, TaxResult, IncomeDetails } from '@/lib/types';
 import { formatCurrency } from '@/lib/taxEngine';
 import { downloadTaxReport } from '@/lib/pdfGenerator';
 import StrategyCard from './StrategyCard';
+import RegimeGuidance from './RegimeGuidance';
+import FilingGuide from './FilingGuide';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ArrowRight, Download, TrendingDown, TrendingUp, Scale, Sparkles, Mail, Check, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
 import { toast } from 'sonner';
@@ -11,6 +13,7 @@ interface DashboardProps {
   comparison: TaxComparison;
   strategies: Strategy[];
   userName: string;
+  income?: IncomeDetails;
 }
 
 const StepNumber = ({ num, active = true }: { num: number; active?: boolean }) => (
@@ -305,7 +308,7 @@ const RegimeDetail = ({ result, label }: { result: TaxResult; label: string }) =
     </div>
   );
 };
-const Dashboard = ({ comparison, strategies, userName }: DashboardProps) => {
+const Dashboard = ({ comparison, strategies, userName, income }: DashboardProps) => {
   const [visibleStrategies, setVisibleStrategies] = useState(10);
   const [showUpsell, setShowUpsell] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -444,6 +447,9 @@ const Dashboard = ({ comparison, strategies, userName }: DashboardProps) => {
         </Tabs>
       </div>
 
+      {/* Regime Guidance & Charts */}
+      <RegimeGuidance comparison={comparison} />
+
       {/* Savings summary */}
       <div className="card-premium p-5 mb-6 border-success/20 bg-success/5">
         <div className="flex items-center gap-3">
@@ -541,10 +547,8 @@ const Dashboard = ({ comparison, strategies, userName }: DashboardProps) => {
         </div>
       </div>
 
-      <p className="text-center text-[10px] text-muted-foreground mt-6 mb-10">
-        Disclaimer: This report is for informational purposes only. Consult a qualified Chartered Accountant before making tax decisions.
-        All strategies are based on the Indian Income Tax Act and commonly accepted interpretations.
-      </p>
+      {/* Filing Guide, CA Finder, Disclaimer */}
+      <FilingGuide comparison={comparison} income={income} />
     </div>
   );
 };
