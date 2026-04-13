@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { TaxComparison, Strategy, TaxResult, IncomeDetails } from '@/lib/types';
+import { TaxComparison, Strategy, TaxResult, IncomeDetails, DeductionDetails } from '@/lib/types';
 import { formatCurrency } from '@/lib/taxEngine';
 import { downloadTaxReport } from '@/lib/pdfGenerator';
 import StrategyCard from './StrategyCard';
 import RegimeGuidance from './RegimeGuidance';
 import FilingGuide from './FilingGuide';
+import TaxHealthScore from './TaxHealthScore';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ArrowRight, Download, TrendingDown, TrendingUp, Scale, Sparkles, Mail, Check, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
 import { toast } from 'sonner';
@@ -14,6 +15,7 @@ interface DashboardProps {
   strategies: Strategy[];
   userName: string;
   income?: IncomeDetails;
+  deductions?: DeductionDetails;
 }
 
 const StepNumber = ({ num, active = true }: { num: number; active?: boolean }) => (
@@ -308,7 +310,7 @@ const RegimeDetail = ({ result, label }: { result: TaxResult; label: string }) =
     </div>
   );
 };
-const Dashboard = ({ comparison, strategies, userName, income }: DashboardProps) => {
+const Dashboard = ({ comparison, strategies, userName, income, deductions }: DashboardProps) => {
   const [visibleStrategies, setVisibleStrategies] = useState(10);
   const [showUpsell, setShowUpsell] = useState(false);
   const [loading, setLoading] = useState(true);
