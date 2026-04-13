@@ -67,7 +67,7 @@ function parseAISText(text: string) {
   }
 
   function isSectionCode(n: number): boolean {
-    const codes = [192, 194, 1941, 1942, 1943, 1944, 1945, 1946, 1947, 1948, 1949, 19410, 80, 80C, 80D]
+    const codes = [192, 194, 1941, 1942, 1943, 1944, 1945, 1946, 1947, 1948, 1949, 19410, 80]
     return n < 500 || codes.includes(n)
   }
 
