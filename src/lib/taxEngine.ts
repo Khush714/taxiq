@@ -131,7 +131,7 @@ function getTotalDeductionsOldRegime(deductions: DeductionDetails, profile: User
 
 function getGrossIncome(income: IncomeDetails): number {
   return income.salary + income.bonus + income.capitalGainsSTCG + income.capitalGainsLTCG +
-    income.rentalIncome + income.interestIncome + income.otherIncome + income.businessIncome;
+    income.rentalIncome + income.interestIncome + income.dividendIncome + income.otherIncome + income.businessIncome;
 }
 
 export function calculateTax(

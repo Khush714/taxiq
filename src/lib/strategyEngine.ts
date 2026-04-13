@@ -9,7 +9,7 @@ export function generateStrategies(
 ): Strategy[] {
   const strategies: Strategy[] = [];
   const grossIncome = income.salary + income.bonus + income.capitalGainsSTCG + income.capitalGainsLTCG +
-    income.rentalIncome + income.interestIncome + income.otherIncome + income.businessIncome;
+    income.rentalIncome + income.interestIncome + income.dividendIncome + income.otherIncome + income.businessIncome;
   const isHighIncome = grossIncome >= 5000000;
   const isResident = profile.residentialStatus === 'resident';
   const isMarried = profile.maritalStatus === 'married';
