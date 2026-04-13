@@ -1,7 +1,14 @@
 import { useState, useRef, useCallback } from 'react';
 import { Upload, FileText, Lock, Loader2, CheckCircle2, AlertTriangle, ShieldCheck, X } from 'lucide-react';
 import { IncomeDetails } from '@/lib/types';
-import { parseAISText, AISParseResult } from '@/lib/aisParser';
+
+interface AISParseResult {
+  success: boolean;
+  income: Partial<IncomeDetails>;
+  extractedFields: string[];
+  rawAmounts: Record<string, number>;
+  warnings: string[];
+}
 
 interface AISUploaderProps {
   onAutoFill: (income: Partial<IncomeDetails>, extractedFields: string[]) => void;
