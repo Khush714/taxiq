@@ -59,6 +59,9 @@ const StrategyCard = ({ strategy, index, locked }: StrategyCardProps) => {
         <div className="text-right shrink-0">
           <p className="text-sm font-bold gold-gradient-text">₹{strategy.estimatedSavings.toLocaleString('en-IN')}</p>
           <p className="text-[10px] text-muted-foreground">est. savings</p>
+          <span className="text-[10px] font-bold text-success bg-success/10 px-1.5 py-0.5 rounded-full mt-1 inline-block">
+            +{Math.min(12, Math.max(2, Math.round(strategy.estimatedSavings / 5000)))} score
+          </span>
         </div>
       </div>
 
