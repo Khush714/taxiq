@@ -391,6 +391,14 @@ const Dashboard = ({ comparison, strategies, userName, income, deductions }: Das
         <p className="text-sm text-muted-foreground">Prepared for {userName} · FY 2024-25</p>
       </div>
 
+      {/* Tax Health Score */}
+      <TaxHealthScore
+        comparison={comparison}
+        strategies={strategies}
+        income={income}
+        deductions={deductions}
+      />
+
       {/* Quick Summary Cards */}
       <div className="grid grid-cols-2 gap-3 mb-4">
         <div className={`card-premium p-4 ${comparison.recommended === 'old' ? 'border-primary/40' : ''}`}>
