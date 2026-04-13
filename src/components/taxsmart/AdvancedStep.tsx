@@ -55,13 +55,15 @@ const AdvancedStep = ({ advanced, onUpdate, onNext, onBack }: AdvancedStepProps)
         {advanced.hasProperty && (
           <div className="animate-fade-in pl-4 border-l-2 border-primary/30">
             <label className="block text-sm font-medium mb-1.5 text-foreground">Number of Properties</label>
-            <input
-              type="number"
-              min={1}
-              value={advanced.numberOfProperties || 1}
-              onChange={(e) => onUpdate({ ...advanced, numberOfProperties: parseInt(e.target.value) || 1 })}
+            <select
+              value={advanced.numberOfProperties}
+              onChange={(e) => onUpdate({ ...advanced, numberOfProperties: parseInt(e.target.value) })}
               className="input-premium w-full"
-            />
+            >
+              {[0, 1, 2, 3, 4, 5].map(n => (
+                <option key={n} value={n}>{n}</option>
+              ))}
+            </select>
           </div>
         )}
 

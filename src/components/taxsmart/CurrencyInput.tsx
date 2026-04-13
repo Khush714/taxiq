@@ -29,19 +29,19 @@ const CurrencyInput = ({ value, onChange, placeholder = '₹', className = '', m
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value.replace(/[^0-9]/g, '');
-    if (!raw) {
+    if (raw === '') {
       setDisplay('');
       onChange(0);
       return;
     }
     let num = parseInt(raw, 10);
-    if (max) num = Math.min(num, max);
-    setDisplay(formatIndian(num));
+    if (max !== undefined) num = Math.min(num, max);
+    setDisplay(num === 0 ? '0' : formatIndian(num));
     onChange(num);
   };
 
   const handleBlur = () => {
-    setDisplay(value ? formatIndian(value) : '');
+    setDisplay(value === 0 ? '' : formatIndian(value));
   };
 
   return (
