@@ -140,6 +140,7 @@ const Index = () => {
             strategies={strategies}
             userName={profile.fullName}
             income={income}
+            deductions={deductions}
           />
         )}
       </main>
