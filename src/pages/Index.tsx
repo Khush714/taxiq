@@ -25,8 +25,8 @@ const defaultProfile: UserProfile = {
 };
 
 const defaultIncome: IncomeDetails = {
-  salary: 0, bonus: 0, capitalGainsSTCG: 0, capitalGainsLTCG: 0,
-  rentalIncome: 0, interestIncome: 0, otherIncome: 0, businessIncome: 0,
+  salary: 0, basicSalary: 0, hra: 0, rentPaid: 0, bonus: 0, capitalGainsSTCG: 0, capitalGainsLTCG: 0,
+  rentalIncome: 0, interestIncome: 0, dividendIncome: 0, otherIncome: 0, businessIncome: 0, tds: 0,
 };
 
 const defaultDeductions: DeductionDetails = {

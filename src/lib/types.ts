@@ -13,13 +13,18 @@ export interface UserProfile {
 
 export interface IncomeDetails {
   salary: number;
+  basicSalary: number;
+  hra: number;
+  rentPaid: number;
   bonus: number;
   capitalGainsSTCG: number;
   capitalGainsLTCG: number;
   rentalIncome: number;
   interestIncome: number;
+  dividendIncome: number;
   otherIncome: number;
   businessIncome: number;
+  tds: number;
 }
 
 export interface DeductionDetails {
