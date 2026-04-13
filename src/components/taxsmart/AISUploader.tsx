@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback } from 'react';
 import { Upload, FileText, Lock, Loader2, CheckCircle2, AlertTriangle, ShieldCheck, X } from 'lucide-react';
 import { IncomeDetails } from '@/lib/types';
+import { parseAISText } from '@/lib/aisParser';
 
 interface AISParseResult {
   success: boolean;
@@ -16,6 +17,50 @@ interface AISUploaderProps {
 }
 
 type Stage = 'upload' | 'password' | 'processing' | 'done' | 'error';
+
+const mapEdgeResultToAISResult = (parsed: any): AISParseResult => {
+  const income: Partial<IncomeDetails> = {};
+  const extractedFields: string[] = [];
+  const rawAmounts: Record<string, number> = {};
+
+  if (parsed.salary > 0) {
+    income.salary = parsed.salary;
+    extractedFields.push('Salary');
+    rawAmounts['Salary'] = parsed.salary;
+  }
+
+  if (parsed.interest_income > 0) {
+    income.interestIncome = parsed.interest_income;
+    extractedFields.push('Interest Income');
+    rawAmounts['Interest Income'] = parsed.interest_income;
+  }
+
+  if (parsed.capital_gains > 0) {
+    income.capitalGainsSTCG = parsed.capital_gains;
+    extractedFields.push('Capital Gains');
+    rawAmounts['Capital Gains'] = parsed.capital_gains;
+  }
+
+  if (parsed.dividend_income > 0) {
+    income.otherIncome = (income.otherIncome || 0) + parsed.dividend_income;
+    extractedFields.push('Dividend Income');
+    rawAmounts['Dividend Income'] = parsed.dividend_income;
+  }
+
+  if (parsed.other_income > 0) {
+    income.otherIncome = (income.otherIncome || 0) + parsed.other_income;
+    if (!extractedFields.includes('Other Income')) extractedFields.push('Other Income');
+    rawAmounts['Other Income'] = parsed.other_income;
+  }
+
+  return {
+    success: extractedFields.length > 0,
+    income,
+    extractedFields,
+    rawAmounts,
+    warnings: extractedFields.length > 0 ? [] : ['Could not extract any income data from the AIS. Please fill details manually.'],
+  };
+};
 
 const AISUploader = ({ onAutoFill, onCancel }: AISUploaderProps) => {
   const [stage, setStage] = useState<Stage>('upload');
@@ -54,11 +99,9 @@ const AISUploader = ({ onAutoFill, onCancel }: AISUploaderProps) => {
     setProgress(10);
 
     try {
-      // Step 1: Read file
       const arrayBuffer = await file.arrayBuffer();
       setProgress(15);
 
-      // Step 2: Decrypt PDF client-side using pdfjs-dist
       const pdfjsLib = await import('pdfjs-dist');
       pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
       setProgress(25);
@@ -76,75 +119,59 @@ const AISUploader = ({ onAutoFill, onCancel }: AISUploaderProps) => {
       }
       setProgress(40);
 
-      // Step 3: Extract text from all pages
       let fullText = '';
       for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i);
         const content = await page.getTextContent();
-        const pageText = content.items.map((item: any) => item.str).join(' ');
-        fullText += pageText + '\n';
+        const pageText = content.items.map((item: any) => item.str ?? '').join(' ');
+        fullText += `${pageText}\n`;
         setProgress(40 + Math.round((i / pdf.numPages) * 25));
       }
-      setProgress(70);
 
-      // Step 4: Send extracted text to edge function for parsing
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://mzgmikrbmggmksxwlmbg.supabase.co';
-      const response = await fetch(`${supabaseUrl}/functions/v1/parse-ais`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: fullText }),
-      });
-      setProgress(90);
+      const normalizedText = fullText.replace(/\u0000/g, ' ').replace(/\s{2,}/g, ' ').trim();
+      const letterCount = (normalizedText.match(/[A-Za-z]/g) || []).length;
 
-      const data = await response.json();
-
-      if (!response.ok || data.error) {
-        setError(data.error || "We couldn't fully read your AIS. Please fill details manually.");
+      if (normalizedText.length < 120 || letterCount < 40) {
+        setError('We could not read enough text from this AIS PDF. It may be image-based or unreadable. Please try another AIS download or enter details manually.');
         setStage('error');
         return;
       }
 
-      // Map edge function response to AISParseResult format
-      const parsed = data.data || data;
-      const income: Partial<IncomeDetails> = {};
-      const extractedFields: string[] = [];
-      const rawAmounts: Record<string, number> = {};
+      setProgress(75);
 
-      if (parsed.salary > 0) {
-        income.salary = parsed.salary;
-        extractedFields.push('salary');
-        rawAmounts['Salary'] = parsed.salary;
-      }
-      if (parsed.interest_income > 0) {
-        income.interestIncome = parsed.interest_income;
-        extractedFields.push('interestIncome');
-        rawAmounts['Interest Income'] = parsed.interest_income;
-      }
-      if (parsed.dividend_income > 0) {
-        income.otherIncome = (income.otherIncome || 0) + parsed.dividend_income;
-        extractedFields.push('otherIncome');
-        rawAmounts['Dividend Income'] = parsed.dividend_income;
-      }
-      if (parsed.capital_gains > 0) {
-        income.capitalGainsSTCG = parsed.capital_gains;
-        extractedFields.push('capitalGainsSTCG');
-        rawAmounts['Capital Gains'] = parsed.capital_gains;
-      }
-      if (parsed.other_income > 0) {
-        income.otherIncome = (income.otherIncome || 0) + parsed.other_income;
-        if (!extractedFields.includes('otherIncome')) extractedFields.push('otherIncome');
-        rawAmounts['Other Income'] = parsed.other_income;
-      }
-
-      setProgress(100);
-
-      if (extractedFields.length > 0) {
-        setResult({ success: true, income, extractedFields, rawAmounts, warnings: [] });
+      const localResult = parseAISText(normalizedText);
+      if (localResult.success) {
+        setResult(localResult);
+        setProgress(100);
         setStage('done');
-      } else {
-        setError("No income data found in your AIS. Please fill details manually.");
-        setStage('error');
+        return;
       }
+
+      try {
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://mzgmikrbmggmksxwlmbg.supabase.co';
+        const response = await fetch(`${supabaseUrl}/functions/v1/parse-ais`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: normalizedText }),
+        });
+        const data = await response.json();
+        setProgress(95);
+
+        if (response.ok && !data.error) {
+          const edgeResult = mapEdgeResultToAISResult(data.data || data);
+          if (edgeResult.success) {
+            setResult(edgeResult);
+            setProgress(100);
+            setStage('done');
+            return;
+          }
+        }
+      } catch (edgeError) {
+        console.warn('AIS edge parsing fallback failed:', edgeError);
+      }
+
+      setError(localResult.warnings[0] || 'No income data found in your AIS. Please review manually.');
+      setStage('error');
     } catch (err: any) {
       console.error('AIS processing error:', err);
       setError('Failed to process AIS PDF. Please try again or fill details manually.');
