@@ -54,32 +54,55 @@ const AISUploader = ({ onAutoFill, onCancel }: AISUploaderProps) => {
     setProgress(10);
 
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('password', password);
-      setProgress(30);
+      // Step 1: Read file
+      const arrayBuffer = await file.arrayBuffer();
+      setProgress(15);
 
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://mzgmikrbmggmksxwlmbg.supabase.co';
-      const response = await fetch(`${supabaseUrl}/functions/v1/parse-ais`, {
-        method: 'POST',
-        body: formData,
-      });
-      setProgress(80);
+      // Step 2: Decrypt PDF client-side using pdfjs-dist
+      const pdfjsLib = await import('pdfjs-dist');
+      pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
+      setProgress(25);
 
-      const data = await response.json();
-
-      if (!response.ok || data.error) {
-        if (response.status === 422 && data.error?.toLowerCase().includes('password')) {
+      let pdf;
+      try {
+        pdf = await pdfjsLib.getDocument({ data: arrayBuffer, password }).promise;
+      } catch (err: any) {
+        if (err?.name === 'PasswordException') {
           setError('Incorrect password. Please try again.');
           setStage('password');
           return;
         }
+        throw err;
+      }
+      setProgress(40);
+
+      // Step 3: Extract text from all pages
+      let fullText = '';
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        const pageText = content.items.map((item: any) => item.str).join(' ');
+        fullText += pageText + '\n';
+        setProgress(40 + Math.round((i / pdf.numPages) * 25));
+      }
+      setProgress(70);
+
+      // Step 4: Send extracted text to edge function for parsing
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://mzgmikrbmggmksxwlmbg.supabase.co';
+      const response = await fetch(`${supabaseUrl}/functions/v1/parse-ais`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: fullText }),
+      });
+      setProgress(90);
+
+      const data = await response.json();
+
+      if (!response.ok || data.error) {
         setError(data.error || "We couldn't fully read your AIS. Please fill details manually.");
         setStage('error');
         return;
       }
-
-      setProgress(90);
 
       // Map edge function response to AISParseResult format
       const parsed = data.data || data;
@@ -116,13 +139,7 @@ const AISUploader = ({ onAutoFill, onCancel }: AISUploaderProps) => {
       setProgress(100);
 
       if (extractedFields.length > 0) {
-        setResult({
-          success: true,
-          income,
-          extractedFields,
-          rawAmounts,
-          warnings: [],
-        });
+        setResult({ success: true, income, extractedFields, rawAmounts, warnings: [] });
         setStage('done');
       } else {
         setError("No income data found in your AIS. Please fill details manually.");
