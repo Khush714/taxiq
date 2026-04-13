@@ -203,14 +203,17 @@ const AISUploader = ({ onAutoFill, onCancel }: AISUploaderProps) => {
           <div className="text-center py-4">
             <CheckCircle2 className="w-10 h-10 text-green-500 mx-auto mb-2" />
             <p className="font-medium text-foreground">AIS Processed Successfully!</p>
-            <p className="text-sm text-muted-foreground">We extracted {result.extractedFields.length} income field(s)</p>
+            <p className="text-sm text-muted-foreground">Extracted {result.extractedFields.length} income category(ies)</p>
           </div>
 
-          <div className="bg-secondary/50 rounded-lg p-3 space-y-1">
-            {result.extractedFields.map((field) => (
-              <div key={field} className="flex items-center gap-2 text-sm">
-                <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
-                <span className="text-foreground">{field}</span>
+          <div className="bg-secondary/50 rounded-lg p-3 space-y-2">
+            {Object.entries(result.rawAmounts).map(([label, amount]) => (
+              <div key={label} className="flex items-center justify-between text-sm">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-green-500 flex-shrink-0" />
+                  <span className="text-foreground">{label}</span>
+                </div>
+                <span className="font-medium text-foreground tabular-nums">₹{amount.toLocaleString('en-IN')}</span>
               </div>
             ))}
           </div>
