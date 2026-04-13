@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { UserProfile, IncomeDetails, DeductionDetails, AdvancedProfile, RiskPreference, TaxComparison, Strategy } from '@/lib/types';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { compareTaxRegimes } from '@/lib/taxEngine';
 import { generateStrategies } from '@/lib/strategyEngine';
 import LandingPage from '@/components/taxsmart/LandingPage';
@@ -50,6 +51,7 @@ const Index = () => {
   const [deductions, setDeductions] = useState<DeductionDetails>(defaultDeductions);
   const [advanced, setAdvanced] = useState<AdvancedProfile>(defaultAdvanced);
   const [risk, setRisk] = useState<RiskPreference>('moderate');
+  const [financialYear, setFinancialYear] = useState<string>('2024-25');
   const [comparison, setComparison] = useState<TaxComparison | null>(null);
   const [strategies, setStrategies] = useState<Strategy[]>([]);
 
@@ -77,7 +79,17 @@ const Index = () => {
             <span className="text-[10px] text-muted-foreground ml-1 bg-secondary px-1.5 py-0.5 rounded">India</span>
           </div>
           {view === 'form' && (
-            <span className="text-[10px] text-muted-foreground">FY 2024-25</span>
+            <div className="flex items-center gap-2">
+              <Select value={financialYear} onValueChange={setFinancialYear}>
+                <SelectTrigger className="h-7 text-[10px] w-auto gap-1 border-border bg-secondary/50">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="2024-25">FY 2024-25 (Previous)</SelectItem>
+                  <SelectItem value="2025-26">FY 2025-26 (Current)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           )}
         </div>
       </header>
