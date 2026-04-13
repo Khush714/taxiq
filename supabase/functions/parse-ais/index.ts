@@ -1,11 +1,9 @@
 /**
  * supabase/functions/parse-ais/index.ts
  *
- * Supabase Edge Function — AIS PDF parser
- * Uses unpdf for Deno-compatible PDF text extraction
+ * Accepts JSON { text: string } with pre-extracted PDF text.
+ * PDF decryption happens client-side via pdfjs-dist.
  */
-
-import { extractText } from "npm:unpdf";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -13,8 +11,6 @@ const corsHeaders = {
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
-
-/* ─── Amount helpers ─── */
 
 function cleanAmount(val: string): number {
   return parseFloat(val.replace(/,/g, "").trim()) || 0;
@@ -25,8 +21,6 @@ function extractAmounts(line: string): number[] {
   if (!matches) return [];
   return matches.map(cleanAmount).filter((n) => n > 0);
 }
-
-/* ─── Core AIS parser ─── */
 
 interface AISResult {
   salary: number;
@@ -112,15 +106,6 @@ function parseAISData(rawText: string): AISResult {
   return result;
 }
 
-/* ─── Extract text from PDF using unpdf ─── */
-
-async function extractTextFromPDF(bytes: Uint8Array): Promise<string> {
-  const { text } = await extractText(bytes, { mergePages: true });
-  return text;
-}
-
-/* ─── Main handler ─── */
-
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { status: 204, headers: corsHeaders });
@@ -134,72 +119,24 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    let formData: FormData;
-    try {
-      formData = await req.formData();
-    } catch {
+    const body = await req.json();
+    const text = body?.text;
+
+    if (!text || typeof text !== "string") {
       return new Response(
-        JSON.stringify({ error: "Invalid form data. Send multipart/form-data with a 'file' field." }),
+        JSON.stringify({ error: 'Missing or invalid "text" field. Send extracted PDF text as JSON.' }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    const fileField = formData.get("file");
-    if (!fileField || typeof fileField === "string") {
+    if (text.trim().length < 50) {
       return new Response(
-        JSON.stringify({ error: "No PDF file uploaded." }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    const file = fileField as File;
-
-    if (file.size > 15 * 1024 * 1024) {
-      return new Response(
-        JSON.stringify({ error: "File too large. Maximum size is 15 MB." }),
-        { status: 413, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    const arrayBuffer = await file.arrayBuffer();
-    const bytes = new Uint8Array(arrayBuffer);
-
-    let rawText: string;
-    try {
-      rawText = await extractTextFromPDF(bytes);
-    } catch (pdfErr: unknown) {
-      console.error("[parse-ais] PDF extraction error:", pdfErr);
-      const msg = pdfErr instanceof Error ? pdfErr.message.toLowerCase() : "";
-      if (msg.includes("password") || msg.includes("encrypted")) {
-        return new Response(
-          JSON.stringify({
-            error:
-              "This PDF appears to be password-protected. " +
-              "Please decrypt it first using your PAN + DOB, then re-upload.",
-          }),
-          { status: 422, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-      return new Response(
-        JSON.stringify({
-          error: "Could not read the PDF. Please make sure it is a valid AIS document from incometax.gov.in.",
-        }),
+        JSON.stringify({ error: "No readable content found. Please re-download your AIS from the IT portal." }),
         { status: 422, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    if (!rawText || rawText.trim().length < 50) {
-      return new Response(
-        JSON.stringify({
-          error:
-            "No readable text found in this PDF. " +
-            "Please re-download your AIS from the IT portal.",
-        }),
-        { status: 422, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    const parsed = parseAISData(rawText);
+    const parsed = parseAISData(text);
 
     return new Response(
       JSON.stringify({ success: true, ...parsed, data: parsed }),
