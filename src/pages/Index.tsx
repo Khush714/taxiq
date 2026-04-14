@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { UserProfile, IncomeDetails, DeductionDetails, AdvancedProfile, RiskPreference, TaxComparison, Strategy } from '@/lib/types';
-import { } from '@/components/ui/select';
+
 import { compareTaxRegimes } from '@/lib/taxEngine';
 import { generateStrategies } from '@/lib/strategyEngine';
 import LandingPage from '@/components/taxsmart/LandingPage';
