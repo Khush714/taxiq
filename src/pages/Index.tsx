@@ -14,6 +14,7 @@ import PaywallPage from '@/components/taxsmart/PaywallPage';
 import Dashboard from '@/components/taxsmart/Dashboard';
 import { Sparkles } from 'lucide-react';
 import AnimatedBackground from '@/components/taxsmart/AnimatedBackground';
+import AIChatBot from '@/components/taxsmart/AIChatBot';
 
 const defaultProfile: UserProfile = {
   fullName: '',
@@ -144,6 +145,7 @@ const Index = () => {
           />
         )}
       </main>
+      <AIChatBot />
     </div>
   );
 };
