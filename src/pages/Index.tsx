@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { UserProfile, IncomeDetails, DeductionDetails, AdvancedProfile, RiskPreference, TaxComparison, Strategy } from '@/lib/types';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { } from '@/components/ui/select';
 import { compareTaxRegimes } from '@/lib/taxEngine';
 import { generateStrategies } from '@/lib/strategyEngine';
 import LandingPage from '@/components/taxsmart/LandingPage';
@@ -79,18 +79,10 @@ const Index = () => {
             <span className="font-serif font-bold text-foreground text-lg">TaxSmart <span className="gold-gradient-text">AI</span></span>
             <span className="text-[10px] text-muted-foreground ml-1 bg-secondary px-1.5 py-0.5 rounded">India</span>
           </div>
-          {view === 'form' && (
-            <div className="flex items-center gap-2">
-              <Select value={financialYear} onValueChange={setFinancialYear}>
-                <SelectTrigger className="h-7 text-[10px] w-auto gap-1 border-border bg-secondary/50">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="2024-25">FY 2024-25 (Previous)</SelectItem>
-                  <SelectItem value="2025-26">FY 2025-26 (Current)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          {view !== 'landing' && (
+            <span className="text-xs text-muted-foreground bg-secondary px-2 py-1 rounded">
+              FY {financialYear}
+            </span>
           )}
         </div>
       </header>
@@ -104,7 +96,7 @@ const Index = () => {
           <>
             <StepProgress currentStep={step} />
             {step === 0 && (
-              <ProfileStep profile={profile} onUpdate={setProfile} onNext={() => setStep(1)} />
+              <ProfileStep profile={profile} onUpdate={setProfile} onNext={() => setStep(1)} financialYear={financialYear} onFinancialYearChange={setFinancialYear} />
             )}
             {step === 1 && (
               <IncomeStep income={income} onUpdate={setIncome} onNext={() => setStep(2)} onBack={() => setStep(0)} />
