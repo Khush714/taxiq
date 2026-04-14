@@ -434,6 +434,11 @@ const Dashboard = ({ comparison, strategies, userName, income, deductions }: Das
         deductions={deductions}
       />
 
+      {/* Tax Deadlines */}
+      <div className="mb-4">
+        <TaxDeadlines />
+      </div>
+
       {/* Quick Summary Cards */}
       <div className="grid grid-cols-2 gap-3 mb-4">
         <div className={`card-premium p-4 ${comparison.recommended === 'old' ? 'border-primary/40' : ''}`}>
