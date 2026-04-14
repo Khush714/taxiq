@@ -7,6 +7,7 @@ import StrategyCard from './StrategyCard';
 import RegimeGuidance from './RegimeGuidance';
 import FilingGuide from './FilingGuide';
 import TaxHealthScore from './TaxHealthScore';
+import TaxDeadlines from './TaxDeadlines';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ArrowRight, Download, TrendingDown, TrendingUp, Scale, Sparkles, Mail, Check, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
 import { toast } from 'sonner';
