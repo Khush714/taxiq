@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { TaxComparison, Strategy, TaxResult, IncomeDetails, DeductionDetails } from '@/lib/types';
 import { formatCurrency } from '@/lib/taxEngine';
 import { downloadTaxReport } from '@/lib/pdfGenerator';
+import { supabase } from '@/integrations/supabase/client';
 import StrategyCard from './StrategyCard';
 import RegimeGuidance from './RegimeGuidance';
 import FilingGuide from './FilingGuide';
@@ -346,19 +347,52 @@ const Dashboard = ({ comparison, strategies, userName, income, deductions }: Das
     }
   };
 
-  const handleSendEmail = () => {
+  const handleSendEmail = async () => {
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       toast.error('Please enter a valid email address.');
       return;
     }
     setSendingEmail(true);
-    setTimeout(() => {
-      setSendingEmail(false);
-      setEmailSent(true);
-      toast.success(`Report will be sent to ${email}`, {
-        description: 'Enable Lovable Cloud for live email delivery.',
+    try {
+      const { data, error } = await supabase.functions.invoke('send-tax-report', {
+        body: {
+          email,
+          userName,
+          comparison: {
+            recommended: comparison.recommended,
+            savings: comparison.savings,
+            reason: comparison.reason,
+            oldRegime: {
+              totalTax: comparison.oldRegime.totalTax,
+              grossIncome: comparison.oldRegime.grossIncome,
+              totalDeductions: comparison.oldRegime.totalDeductions,
+              taxableIncome: comparison.oldRegime.taxableIncome,
+            },
+            newRegime: {
+              totalTax: comparison.newRegime.totalTax,
+              grossIncome: comparison.newRegime.grossIncome,
+              totalDeductions: comparison.newRegime.totalDeductions,
+              taxableIncome: comparison.newRegime.taxableIncome,
+            },
+          },
+          strategies: strategies.slice(0, visibleStrategies).map(s => ({
+            name: s.name,
+            estimatedSavings: s.estimatedSavings,
+            whatToDo: s.whatToDo,
+            difficulty: s.difficulty,
+            riskLevel: s.riskLevel,
+            category: s.category,
+          })),
+        },
       });
-    }, 1500);
+      if (error) throw error;
+      setEmailSent(true);
+      toast.success(`Report sent to ${email}!`);
+    } catch {
+      toast.error('Failed to send report. Please try again.');
+    } finally {
+      setSendingEmail(false);
+    }
   };
 
   if (loading) {
