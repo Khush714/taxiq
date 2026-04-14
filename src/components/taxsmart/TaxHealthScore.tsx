@@ -97,15 +97,20 @@ const getStatus = (score: number, max: number) => {
 };
 
 const LockedStrategyCard = ({ strategy, index }: { strategy: LockedStrategy; index: number }) => (
-  <div className="relative overflow-hidden rounded-xl border border-border/60 bg-card/50 p-4 animate-slide-up" style={{ animationDelay: `${index * 60}ms` }}>
-    <div className="absolute inset-0 backdrop-blur-[2px] bg-background/30 z-10" />
-    <div className="relative z-0">
+  <div className="relative overflow-hidden rounded-xl border border-border/60 bg-card/80 p-4 animate-slide-up" style={{ animationDelay: `${index * 60}ms` }}>
+    {/* Heavy blur overlay - content should NOT be readable */}
+    <div className="absolute inset-0 backdrop-blur-[8px] bg-background/70 z-10 flex items-center justify-center">
+      <div className="flex items-center gap-2 bg-primary/10 px-3 py-1.5 rounded-full border border-primary/20">
+        <Lock className="w-3.5 h-3.5 text-primary" />
+        <span className="text-[10px] font-bold text-primary">Locked</span>
+      </div>
+    </div>
+    <div className="relative z-0 select-none" aria-hidden="true">
       <div className="flex items-start justify-between">
         <div className="flex-1 min-w-0">
           <p className="text-xs font-semibold text-foreground truncate">{strategy.title}</p>
           <p className="text-[10px] text-muted-foreground mt-0.5">{strategy.category}</p>
         </div>
-        <Lock className="w-3.5 h-3.5 text-primary/60 shrink-0 ml-2 mt-0.5" />
       </div>
       <div className="flex items-center gap-3 mt-2.5">
         <span className="text-[10px] font-bold text-success bg-success/10 px-2 py-0.5 rounded-full">

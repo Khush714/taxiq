@@ -7,6 +7,7 @@ import StrategyCard from './StrategyCard';
 import RegimeGuidance from './RegimeGuidance';
 import FilingGuide from './FilingGuide';
 import TaxHealthScore from './TaxHealthScore';
+import TaxDeadlines from './TaxDeadlines';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ArrowRight, Download, TrendingDown, TrendingUp, Scale, Sparkles, Mail, Check, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
 import { toast } from 'sonner';
@@ -432,6 +433,11 @@ const Dashboard = ({ comparison, strategies, userName, income, deductions }: Das
         income={income}
         deductions={deductions}
       />
+
+      {/* Tax Deadlines */}
+      <div className="mb-4">
+        <TaxDeadlines />
+      </div>
 
       {/* Quick Summary Cards */}
       <div className="grid grid-cols-2 gap-3 mb-4">
