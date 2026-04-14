@@ -396,6 +396,184 @@ export function generateStrategies(
     });
   }
 
+  // ========== ADVANCED STRATEGIES (Non-obvious, high-impact, legal) ==========
+
+  // Leave Encashment structuring
+  if (income.salary > 1200000) {
+    strategies.push({
+      id: 'leave-encashment',
+      name: 'Leave Encashment Exemption Planning',
+      whatToDo: 'Accumulate earned leave and encash at retirement/resignation. Leave encashment at retirement is exempt up to ₹25L (u/s 10(10AA)). Plan your leave accumulation to maximize this tax-free payout.',
+      whyApplicable: `With salary of ₹${(income.salary / 100000).toFixed(1)}L, accumulated leave encashment at exit can be a significant tax-free component. Negotiate with employer to allow higher leave accumulation.`,
+      estimatedSavings: Math.round(income.salary * 0.03),
+      difficulty: 'Medium',
+      riskLevel: 'Safe',
+      complianceNote: 'Exemption of ₹25L applies only on retirement/resignation, not during service. During service, fully taxable.',
+      category: 'Salary Structuring',
+      priority: 71,
+    });
+  }
+
+  // Sovereign Gold Bond (SGB) LTCG exemption
+  if (advanced.isStockInvestor || grossIncome > 1000000) {
+    strategies.push({
+      id: 'sgb-ltcg-exempt',
+      name: 'Sovereign Gold Bond — Zero LTCG Tax',
+      whatToDo: 'Invest in RBI Sovereign Gold Bonds (SGBs). If held to maturity (8 years), LTCG is completely tax-exempt. You also earn 2.5% annual interest. Use this as a gold allocation strategy.',
+      whyApplicable: `Unlike physical gold or gold ETFs (taxed at slab rate for <3yrs, 20% with indexation for >3yrs), SGB redemption at maturity attracts ZERO capital gains tax. Plus 2.5% annual interest.`,
+      estimatedSavings: Math.round(grossIncome * 0.01),
+      difficulty: 'Easy',
+      riskLevel: 'Safe',
+      complianceNote: 'LTCG exemption only on maturity (8 years). Early redemption after 5 years is taxable. Interest is taxable at slab rate.',
+      category: 'Investments',
+      priority: 74,
+    });
+  }
+
+  // Section 54EC — Capital Gains Bonds
+  if (income.capitalGainsLTCG > 100000) {
+    strategies.push({
+      id: 'sec-54ec-bonds',
+      name: 'Section 54EC Capital Gains Bonds',
+      whatToDo: `Invest up to ₹50L of LTCG from property/land sale into NHAI/REC/PFC bonds within 6 months. Entire LTCG becomes exempt. Lock-in is 5 years.`,
+      whyApplicable: `You have ₹${(income.capitalGainsLTCG / 100000).toFixed(1)}L in LTCG. Investing in 54EC bonds exempts this gain entirely. The 5-year lock-in is worth the 12.5% tax saved.`,
+      estimatedSavings: Math.round(Math.min(income.capitalGainsLTCG, 5000000) * 0.125),
+      difficulty: 'Medium',
+      riskLevel: 'Safe',
+      complianceNote: 'Must invest within 6 months of transfer. Maximum ₹50L per FY. Cannot be pledged or transferred.',
+      category: 'Capital Gains',
+      priority: 86,
+    });
+  }
+
+  // Section 54F — Reinvest equity LTCG into house
+  if (income.capitalGainsLTCG > 200000 && !advanced.hasProperty) {
+    strategies.push({
+      id: 'sec-54f-house',
+      name: 'Section 54F — Reinvest Gains into Property',
+      whatToDo: 'Reinvest the net sale consideration (not just gains) from any non-residential asset into a residential house within 2 years (purchase) or 3 years (construction). Entire LTCG becomes exempt proportionally.',
+      whyApplicable: `With ₹${(income.capitalGainsLTCG / 100000).toFixed(1)}L LTCG from non-house assets, Section 54F exempts gains proportional to reinvestment. Unlike 54, this applies to ALL asset types except residential property.`,
+      estimatedSavings: Math.round(income.capitalGainsLTCG * 0.125),
+      difficulty: 'Hard',
+      riskLevel: 'Moderate',
+      complianceNote: 'You must not own more than one residential house (other than the new one) on the date of transfer. New house cannot be sold within 3 years.',
+      category: 'Capital Gains',
+      priority: 79,
+    });
+  }
+
+  // Perquisite optimization — Car lease
+  if (income.salary > 2000000) {
+    strategies.push({
+      id: 'car-lease-perq',
+      name: 'Company Car Lease Perquisite Optimization',
+      whatToDo: 'Opt for a company-leased car instead of car allowance. The perquisite value for a leased car (₹1,800-2,400/month for cars >1600cc) is far lower than the actual EMI, saving substantial tax.',
+      whyApplicable: `At ₹${(income.salary / 100000).toFixed(1)}L salary, a car allowance of ₹30K/month is fully taxable (₹3.6L/year at 30% = ₹1.08L tax). A company car lease perquisite is valued at only ₹2,400/month = ₹28,800/year taxable.`,
+      estimatedSavings: 80000,
+      difficulty: 'Medium',
+      riskLevel: 'Safe',
+      complianceNote: 'Car must be owned/leased by the company. Rules differ for cars above and below 1600cc. Driver salary perquisite is ₹900/month.',
+      category: 'Salary Restructuring',
+      priority: 76,
+    });
+  }
+
+  // Intercorporate deposit / family trust
+  if (isHighIncome && isMarried) {
+    strategies.push({
+      id: 'family-trust',
+      name: 'Private Discretionary Family Trust',
+      whatToDo: 'Set up a private discretionary trust for asset protection and income distribution. Income distributed to beneficiaries (adult children, relatives) is taxed in their hands at their slab rates.',
+      whyApplicable: `With income above ₹50L, a family trust allows legitimate distribution of investment income to lower-bracket beneficiaries. Also provides succession planning and asset protection.`,
+      estimatedSavings: Math.round(grossIncome * 0.04),
+      difficulty: 'Hard',
+      riskLevel: 'Advanced',
+      complianceNote: 'Trust must be genuine with proper deed. Clubbing provisions apply for spouse/minor children. Specific trust income taxed at maximum marginal rate unless distributed. Consult a CA.',
+      category: 'Estate Planning',
+      priority: 69,
+    });
+  }
+
+  // Debt fund rebalancing — post-April 2023 rules
+  if (advanced.isStockInvestor && grossIncome > 1500000) {
+    strategies.push({
+      id: 'debt-fund-rebalance',
+      name: 'Debt-to-Equity Rebalancing for Tax Efficiency',
+      whatToDo: 'Post-2023, debt fund gains are taxed at slab rate regardless of holding period. Shift debt allocation to direct bonds/NCDs (listed, held >12 months for 10% LTCG) or tax-free bonds (NHAI, IRFC, PFC).',
+      whyApplicable: `Debt mutual fund gains are now taxed at slab rate (up to 30%). Listed NCDs/bonds held >12 months attract only 10% LTCG. Tax-free bonds pay 5.5-6% completely tax-free, equivalent to 8-9% pre-tax for you.`,
+      estimatedSavings: Math.round(grossIncome * 0.015),
+      difficulty: 'Medium',
+      riskLevel: 'Moderate',
+      complianceNote: 'Listed bond LTCG rate is 10% without indexation for >12 months. Unlisted bonds follow slab rate. Tax-free bond interest is fully exempt.',
+      category: 'Investments',
+      priority: 67,
+    });
+  }
+
+  // Section 80GG — Rent without HRA
+  if (income.hra === 0 && income.rentPaid > 0) {
+    strategies.push({
+      id: 'sec-80gg',
+      name: 'Section 80GG — Rent Deduction without HRA',
+      whatToDo: `Claim deduction under 80GG if you don't receive HRA. Deduction is the least of: ₹5,000/month, 25% of total income, or rent paid minus 10% of total income. File Form 10BA declaration.`,
+      whyApplicable: `You pay rent but don't receive HRA. Section 80GG allows up to ₹60,000/year deduction. Most taxpayers miss this entirely. File Form 10BA (self-declaration) with your ITR.`,
+      estimatedSavings: Math.round(Math.min(60000, income.rentPaid * 0.25) * 0.3),
+      difficulty: 'Easy',
+      riskLevel: 'Safe',
+      complianceNote: 'Neither you, your spouse, nor minor child should own a residential property at the place of employment. File Form 10BA.',
+      category: 'Deductions',
+      priority: 72,
+    });
+  }
+
+  // Interest income — Tax-free bonds reallocation
+  if (income.interestIncome > 100000) {
+    strategies.push({
+      id: 'tax-free-bonds',
+      name: 'Shift FDs to Tax-Free Bonds & SCSS',
+      whatToDo: 'Reallocate fixed deposit holdings to tax-free bonds (NHAI, REC, IRFC) available in secondary market. Interest is 100% tax-free. Senior citizens can use SCSS (₹30L limit, 80TTB deduction).',
+      whyApplicable: `You earn ₹${(income.interestIncome / 100000).toFixed(1)}L in interest income, taxed at up to 30%. Tax-free bonds yielding 5.5% = effective 8% pre-tax. This alone saves ₹${Math.round(income.interestIncome * 0.15).toLocaleString('en-IN')}.`,
+      estimatedSavings: Math.round(income.interestIncome * 0.15),
+      difficulty: 'Easy',
+      riskLevel: 'Safe',
+      complianceNote: 'Tax-free bonds available in secondary market. Check YTM before buying. SCSS limit is ₹30L per individual.',
+      category: 'Investments',
+      priority: 73,
+    });
+  }
+
+  // Gratuity exemption planning
+  if (income.salary > 1500000) {
+    strategies.push({
+      id: 'gratuity-planning',
+      name: 'Gratuity Exemption Planning (Sec 10(10))',
+      whatToDo: 'Gratuity received on retirement/resignation after 5+ years is exempt up to ₹20L. Negotiate higher basic salary to increase gratuity calculation (15 days basic per year of service).',
+      whyApplicable: `At your salary level, gratuity at exit can be ₹10-20L+ if basic salary is structured correctly. This is entirely tax-free up to ₹20L. Higher basic = higher gratuity = more tax-free money at exit.`,
+      estimatedSavings: Math.round(income.salary * 0.02),
+      difficulty: 'Medium',
+      riskLevel: 'Safe',
+      complianceNote: 'Requires 5+ years of continuous service. Exempt up to ₹20L. Formula: 15 days basic × years of service ÷ 26.',
+      category: 'Salary Structuring',
+      priority: 64,
+    });
+  }
+
+  // Rental property — Joint ownership
+  if (advanced.hasProperty && isMarried && income.rentalIncome > 0) {
+    strategies.push({
+      id: 'joint-property-split',
+      name: 'Joint Property Ownership — Split Rental Income',
+      whatToDo: 'If property is jointly owned with spouse, rental income is split in proportion to ownership. Ensure co-ownership is reflected in the sale deed to split rental income and get double deductions.',
+      whyApplicable: `Your rental income of ₹${(income.rentalIncome / 100000).toFixed(1)}L can be split between you and your spouse. Each gets 30% standard deduction, separate Sec 24 interest limit, and lower slab rates.`,
+      estimatedSavings: Math.round(income.rentalIncome * 0.15),
+      difficulty: 'Medium',
+      riskLevel: 'Safe',
+      complianceNote: 'Ownership must be genuine and documented in sale deed. Income split must match ownership ratio. Both must file ITR.',
+      category: 'Property',
+      priority: 66,
+    });
+  }
+
   // Sort by priority and estimated savings
   strategies.sort((a, b) => {
     const scoreA = a.priority * 0.6 + (a.estimatedSavings / 1000) * 0.4;
