@@ -1,14 +1,17 @@
 import { useState } from 'react';
 import { UserProfile, ChildInfo } from '@/lib/types';
-import { User, Heart, Baby, ChevronRight } from 'lucide-react';
+import { User, Heart, Baby, ChevronRight, Calendar } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface ProfileStepProps {
   profile: UserProfile;
   onUpdate: (profile: UserProfile) => void;
   onNext: () => void;
+  financialYear: string;
+  onFinancialYearChange: (fy: string) => void;
 }
 
-const ProfileStep = ({ profile, onUpdate, onNext }: ProfileStepProps) => {
+const ProfileStep = ({ profile, onUpdate, onNext, financialYear, onFinancialYearChange }: ProfileStepProps) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const validate = () => {
@@ -41,6 +44,24 @@ const ProfileStep = ({ profile, onUpdate, onNext }: ProfileStepProps) => {
       </div>
 
       <div className="card-premium p-6 space-y-5">
+        {/* Financial Year */}
+        <div>
+          <label className="block text-sm font-medium mb-1.5 text-foreground flex items-center gap-1.5">
+            <Calendar className="w-4 h-4 text-primary" />
+            Financial Year
+          </label>
+          <Select value={financialYear} onValueChange={onFinancialYearChange}>
+            <SelectTrigger className="input-premium w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="2024-25">FY 2024-25 (Previous)</SelectItem>
+              <SelectItem value="2025-26">FY 2025-26 (Current)</SelectItem>
+            </SelectContent>
+          </Select>
+          <p className="text-muted-foreground text-xs mt-1">Select the year you are filing taxes for</p>
+        </div>
+
         {/* Name */}
         <div>
           <label className="block text-sm font-medium mb-1.5 text-foreground">Full Name</label>
