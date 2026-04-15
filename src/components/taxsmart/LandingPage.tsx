@@ -87,7 +87,7 @@ const LandingPage = ({ onStart }: LandingPageProps) => {
                 </div>
                 <div className="border-t border-border/50 pt-4 pb-4 text-center">
                   <div className="font-mono text-[10px] text-primary mb-2 uppercase tracking-[0.2em]">Tax Health Score</div>
-                  <div className="text-6xl md:text-7xl font-light tabular-nums text-foreground leading-none">98.4</div>
+                  <div className="text-6xl md:text-7xl font-light tabular-nums text-foreground leading-none animate-score-glow">98.4</div>
                   <div className="font-mono text-[10px] text-muted-foreground mt-2 uppercase tracking-widest">Top Percentile</div>
                 </div>
                 <div className="border-t border-border/50 pt-1 flex justify-between">
