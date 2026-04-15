@@ -79,22 +79,25 @@ const LandingPage = ({ onStart }: LandingPageProps) => {
 
           <div className="lg:col-span-5 p-8 md:p-12 bg-card/50 flex flex-col justify-center items-center">
             <RevealSection delay={200}>
-              <div className="relative w-full max-w-[280px] aspect-square border border-border flex items-center justify-center mx-auto">
-                <div className="absolute inset-4 border border-border/50" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="font-mono text-[10px] text-primary mb-1 uppercase tracking-[0.2em]">Tax Health Score</div>
-                    <div className="text-6xl md:text-7xl font-light tabular-nums text-foreground">98.4</div>
-                    <div className="font-mono text-[10px] text-muted-foreground mt-1 uppercase tracking-widest">Top Percentile</div>
-                  </div>
+              <div className="w-full max-w-[280px] mx-auto border border-border p-6 md:p-8">
+                {/* HUD Header */}
+                <div className="flex justify-between items-center mb-1">
+                  <span className="font-mono text-[8px] text-primary uppercase tracking-wider">SAVINGS_ACTIVE</span>
+                  <span className="font-mono text-[8px] text-muted-foreground">TX_ID: 8847-X</span>
                 </div>
-                <div className="absolute top-0 left-0 p-2 font-mono text-[8px] text-muted-foreground">TX_ID: 8847-X</div>
-                <div className="absolute bottom-0 right-0 p-2 font-mono text-[8px] text-muted-foreground">SYNC_STABLE</div>
-                <div className="absolute top-0 right-0 p-2 font-mono text-[8px] text-primary">SAVINGS_ACTIVE</div>
+                <div className="border-t border-border/50 pt-4 pb-4 text-center">
+                  <div className="font-mono text-[10px] text-primary mb-2 uppercase tracking-[0.2em]">Tax Health Score</div>
+                  <div className="text-6xl md:text-7xl font-light tabular-nums text-foreground leading-none">98.4</div>
+                  <div className="font-mono text-[10px] text-muted-foreground mt-2 uppercase tracking-widest">Top Percentile</div>
+                </div>
+                <div className="border-t border-border/50 pt-1 flex justify-between">
+                  <span className="font-mono text-[8px] text-muted-foreground">SYNC_STABLE</span>
+                  <span className="font-mono text-[8px] text-muted-foreground">●  LIVE</span>
+                </div>
               </div>
             </RevealSection>
             <RevealSection delay={350}>
-              <div className="mt-8 w-full max-w-[280px] mx-auto">
+              <div className="mt-6 w-full max-w-[280px] mx-auto">
                 <div className="flex justify-between font-mono text-[10px] mb-2">
                   <span className="text-muted-foreground">Current Liability</span>
                   <span className="text-foreground">₹12,48,200</span>
