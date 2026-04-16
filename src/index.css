@@ -193,3 +193,30 @@
 .animate-score-glow {
   animation: scoreGlow 3s ease-in-out infinite;
 }
+
+@keyframes strategiesHighlight {
+  0% {
+    background-color: hsl(var(--primary) / 0);
+    box-shadow: 0 0 0 0 hsl(var(--primary) / 0);
+    transform: scale(1);
+  }
+  20% {
+    background-color: hsl(var(--primary) / 0.18);
+    box-shadow: 0 0 0 6px hsl(var(--primary) / 0.18), 0 0 24px hsl(var(--primary) / 0.35);
+    transform: scale(1.02);
+  }
+  60% {
+    background-color: hsl(var(--primary) / 0.1);
+    box-shadow: 0 0 0 3px hsl(var(--primary) / 0.1), 0 0 16px hsl(var(--primary) / 0.2);
+    transform: scale(1.01);
+  }
+  100% {
+    background-color: hsl(var(--primary) / 0);
+    box-shadow: 0 0 0 0 hsl(var(--primary) / 0);
+    transform: scale(1);
+  }
+}
+
+.animate-strategies-highlight {
+  animation: strategiesHighlight 2s ease-in-out;
+}
