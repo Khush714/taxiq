@@ -214,11 +214,19 @@ const PaywallPage = ({ comparison, totalStrategies, onUnlock, userName, userEmai
           You're leaving {formatCurrency(savings)} on the table
         </p>
         <p className="text-xs text-muted-foreground line-through mb-1">₹9,999</p>
-        <p className="text-4xl font-serif font-bold gold-gradient-text mb-1">₹499</p>
+        <p className="text-4xl font-serif font-bold gold-gradient-text mb-1">₹299</p>
         <p className="text-xs text-muted-foreground mb-5">One-time payment · Instant access</p>
 
-        <button onClick={onUnlock} className="btn-gold w-full text-base flex items-center justify-center gap-2">
-          Unlock {formatCurrency(savings)} in Savings <ArrowRight className="w-5 h-5" />
+        <button
+          onClick={handlePayment}
+          disabled={loading}
+          className="btn-gold w-full text-base flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+          {loading ? (
+            <><Loader2 className="w-5 h-5 animate-spin" /> Processing...</>
+          ) : (
+            <>Pay ₹299 & Unlock {formatCurrency(savings)} in Savings <ArrowRight className="w-5 h-5" /></>
+          )}
         </button>
       </div>
 
