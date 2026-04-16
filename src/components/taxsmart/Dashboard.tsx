@@ -432,6 +432,9 @@ const Dashboard = ({ comparison, strategies, userName, income, deductions }: Das
         strategies={strategies}
         income={income}
         deductions={deductions}
+        onUnlockFull={() => {
+          document.getElementById('strategies-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }}
       />
 
       {/* Tax Deadlines */}
@@ -512,7 +515,7 @@ const Dashboard = ({ comparison, strategies, userName, income, deductions }: Das
       </div>
 
       {/* Strategies */}
-      <div className="mb-6">
+      <div id="strategies-section" className="mb-6 scroll-mt-24">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-serif font-bold text-foreground">
             Top {Math.min(visibleStrategies, strategies.length)} Strategies
