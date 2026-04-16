@@ -440,9 +440,7 @@ const Dashboard = ({ comparison, strategies, userName, income, deductions }: Das
         strategies={strategies}
         income={income}
         deductions={deductions}
-        onUnlockFull={() => {
-          document.getElementById('strategies-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }}
+        onUnlockFull={scrollToStrategies}
       />
 
       {/* Tax Deadlines */}
