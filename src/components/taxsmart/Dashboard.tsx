@@ -320,6 +320,14 @@ const Dashboard = ({ comparison, strategies, userName, income, deductions }: Das
   const [emailSent, setEmailSent] = useState(false);
   const [sendingEmail, setSendingEmail] = useState(false);
   const [downloading, setDownloading] = useState(false);
+  const [highlightStrategies, setHighlightStrategies] = useState(false);
+
+  const scrollToStrategies = () => {
+    document.getElementById('strategies-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setHighlightStrategies(false);
+    window.setTimeout(() => setHighlightStrategies(true), 600);
+    window.setTimeout(() => setHighlightStrategies(false), 2600);
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 2500);
