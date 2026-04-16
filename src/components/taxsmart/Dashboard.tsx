@@ -522,7 +522,7 @@ const Dashboard = ({ comparison, strategies, userName, income, deductions }: Das
 
       {/* Strategies */}
       <div id="strategies-section" className="mb-6 scroll-mt-24">
-        <div className="flex items-center justify-between mb-4">
+        <div className={`flex items-center justify-between mb-4 rounded-lg px-2 py-1 -mx-2 transition-colors ${highlightStrategies ? 'animate-strategies-highlight' : ''}`}>
           <h3 className="text-lg font-serif font-bold text-foreground">
             Top {Math.min(visibleStrategies, strategies.length)} Strategies
           </h3>
