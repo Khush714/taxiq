@@ -124,6 +124,7 @@ const Index = () => {
             comparison={comparison}
             totalStrategies={strategies.length}
             onUnlock={handleUnlock}
+            userName={profile.fullName}
           />
         )}
 

@@ -1,14 +1,88 @@
 import { TaxComparison } from '@/lib/types';
-import { Lock, Shield, Check, Zap, FileText, Star, ArrowRight, AlertTriangle, TrendingDown, IndianRupee } from 'lucide-react';
+import { Lock, Shield, Check, Zap, FileText, Star, ArrowRight, AlertTriangle, TrendingDown, IndianRupee, Loader2 } from 'lucide-react';
 import { formatCurrency } from '@/lib/taxEngine';
+import { useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
 
 interface PaywallPageProps {
   comparison: TaxComparison;
   totalStrategies: number;
   onUnlock: () => void;
+  userName?: string;
+  userEmail?: string;
 }
 
-const PaywallPage = ({ comparison, totalStrategies, onUnlock }: PaywallPageProps) => {
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
+
+const PaywallPage = ({ comparison, totalStrategies, onUnlock, userName, userEmail }: PaywallPageProps) => {
+  const [loading, setLoading] = useState(false);
+
+  const handlePayment = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('create-razorpay-order', {
+        body: { userName, userEmail },
+      });
+
+      if (error || !data?.orderId) {
+        const msg = data?.message || error?.message || 'Unable to start checkout right now.';
+        toast({ title: 'Payment unavailable', description: msg, variant: 'destructive' });
+        setLoading(false);
+        return;
+      }
+
+      if (typeof window.Razorpay !== 'function') {
+        toast({ title: 'Checkout not loaded', description: 'Please refresh the page and try again.', variant: 'destructive' });
+        setLoading(false);
+        return;
+      }
+
+      const rzp = new window.Razorpay({
+        key: data.keyId,
+        amount: data.amount,
+        currency: data.currency,
+        order_id: data.orderId,
+        name: 'TaxSmart AI',
+        description: 'Top 10 Tax-Saving Strategies Unlock',
+        prefill: { name: userName || '', email: userEmail || '' },
+        theme: { color: '#D4AF37' },
+        handler: async (response: any) => {
+          try {
+            const { data: verify, error: verifyErr } = await supabase.functions.invoke('verify-razorpay-payment', {
+              body: response,
+            });
+            if (verifyErr || !verify?.valid) {
+              toast({ title: 'Verification failed', description: 'Payment could not be verified. Contact support.', variant: 'destructive' });
+              setLoading(false);
+              return;
+            }
+            toast({ title: 'Payment successful', description: 'Unlocking your full tax plan...' });
+            onUnlock();
+          } catch (e) {
+            toast({ title: 'Verification error', description: (e as Error).message, variant: 'destructive' });
+            setLoading(false);
+          }
+        },
+        modal: {
+          ondismiss: () => setLoading(false),
+        },
+      });
+      rzp.on('payment.failed', (resp: any) => {
+        toast({ title: 'Payment failed', description: resp?.error?.description || 'Please try again.', variant: 'destructive' });
+        setLoading(false);
+      });
+      rzp.open();
+    } catch (e) {
+      toast({ title: 'Something went wrong', description: (e as Error).message, variant: 'destructive' });
+      setLoading(false);
+    }
+  };
+
   const savings = comparison.oldRegime.totalTax > comparison.newRegime.totalTax
     ? comparison.oldRegime.totalTax - comparison.newRegime.totalTax
     : comparison.newRegime.totalTax - comparison.oldRegime.totalTax;
@@ -140,11 +214,19 @@ const PaywallPage = ({ comparison, totalStrategies, onUnlock }: PaywallPageProps
           You're leaving {formatCurrency(savings)} on the table
         </p>
         <p className="text-xs text-muted-foreground line-through mb-1">₹9,999</p>
-        <p className="text-4xl font-serif font-bold gold-gradient-text mb-1">₹499</p>
+        <p className="text-4xl font-serif font-bold gold-gradient-text mb-1">₹299</p>
         <p className="text-xs text-muted-foreground mb-5">One-time payment · Instant access</p>
 
-        <button onClick={onUnlock} className="btn-gold w-full text-base flex items-center justify-center gap-2">
-          Unlock {formatCurrency(savings)} in Savings <ArrowRight className="w-5 h-5" />
+        <button
+          onClick={handlePayment}
+          disabled={loading}
+          className="btn-gold w-full text-base flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+          {loading ? (
+            <><Loader2 className="w-5 h-5 animate-spin" /> Processing...</>
+          ) : (
+            <>Pay ₹299 & Unlock {formatCurrency(savings)} in Savings <ArrowRight className="w-5 h-5" /></>
+          )}
         </button>
       </div>
 
