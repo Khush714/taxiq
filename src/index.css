@@ -86,7 +86,7 @@
   }
 
   .gold-gradient-text {
-    background: linear-gradient(135deg, hsl(40 80% 55%), hsl(35 70% 70%));
+    background: linear-gradient(135deg, hsl(200 95% 55%), hsl(160 75% 50%));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -107,12 +107,12 @@
   }
 
   .btn-gold {
-    background: linear-gradient(135deg, hsl(40 80% 55%), hsl(35 90% 45%));
+    background: linear-gradient(135deg, hsl(200 95% 50%), hsl(160 75% 45%));
     @apply text-background font-semibold rounded-lg px-6 py-3 transition-all duration-300;
   }
 
   .btn-gold:hover {
-    background: linear-gradient(135deg, hsl(40 80% 60%), hsl(35 90% 50%));
+    background: linear-gradient(135deg, hsl(200 95% 55%), hsl(160 75% 50%));
     box-shadow: var(--shadow-gold);
     transform: translateY(-1px);
   }
