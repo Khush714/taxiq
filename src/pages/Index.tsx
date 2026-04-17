@@ -131,6 +131,10 @@ const Index = () => {
           />
         )}
 
+        {view === 'receipt' && receipt && (
+          <PaymentReceipt receipt={receipt} onContinue={() => setView('dashboard')} />
+        )}
+
         {view === 'dashboard' && comparison && (
           <Dashboard
             comparison={comparison}
