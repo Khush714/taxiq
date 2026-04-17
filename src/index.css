@@ -181,14 +181,14 @@
 }
 
 .shimmer {
-  background: linear-gradient(90deg, transparent 0%, hsl(40 80% 55% / 0.1) 50%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, hsl(200 95% 55% / 0.12) 50%, transparent 100%);
   background-size: 200% 100%;
   animation: shimmer 2s infinite;
 }
 
 @keyframes scoreGlow {
-  0%, 100% { text-shadow: 0 0 8px hsl(40 80% 55% / 0.15), 0 0 20px hsl(40 80% 55% / 0.05); }
-  50% { text-shadow: 0 0 16px hsl(40 80% 55% / 0.35), 0 0 40px hsl(40 80% 55% / 0.12); }
+  0%, 100% { text-shadow: 0 0 8px hsl(200 95% 55% / 0.18), 0 0 20px hsl(160 75% 50% / 0.08); }
+  50% { text-shadow: 0 0 16px hsl(200 95% 55% / 0.4), 0 0 40px hsl(160 75% 50% / 0.18); }
 }
 
 .animate-score-glow {
