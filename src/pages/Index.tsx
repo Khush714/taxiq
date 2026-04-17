@@ -43,7 +43,7 @@ const defaultAdvanced: AdvancedProfile = {
   hasBusinessIncome: false, spouseIncome: 0,
 };
 
-type AppView = 'landing' | 'form' | 'paywall' | 'dashboard';
+type AppView = 'landing' | 'form' | 'paywall' | 'receipt' | 'dashboard';
 
 const Index = () => {
   const [step, setStep] = useState(0);
@@ -56,6 +56,7 @@ const Index = () => {
   const [financialYear, setFinancialYear] = useState<string>('2024-25');
   const [comparison, setComparison] = useState<TaxComparison | null>(null);
   const [strategies, setStrategies] = useState<Strategy[]>([]);
+  const [receipt, setReceipt] = useState<PaymentReceiptData | null>(null);
 
   const handleAnalyze = useCallback(() => {
     const comp = compareTaxRegimes(income, deductions, profile);
@@ -65,8 +66,9 @@ const Index = () => {
     setView('paywall');
   }, [income, deductions, profile, advanced, risk]);
 
-  const handleUnlock = useCallback(() => {
-    setView('dashboard');
+  const handleUnlock = useCallback((r: PaymentReceiptData) => {
+    setReceipt(r);
+    setView('receipt');
   }, []);
 
   return (
