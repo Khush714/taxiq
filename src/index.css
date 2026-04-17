@@ -134,7 +134,7 @@
   }
 
   .step-indicator-active {
-    background: linear-gradient(135deg, hsl(40 80% 55%), hsl(35 90% 45%));
+    background: linear-gradient(135deg, hsl(200 95% 50%), hsl(160 75% 45%));
     @apply text-background;
   }
 
