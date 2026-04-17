@@ -11,6 +11,7 @@ import DeductionsStep from '@/components/taxsmart/DeductionsStep';
 import AdvancedStep from '@/components/taxsmart/AdvancedStep';
 import RiskStep from '@/components/taxsmart/RiskStep';
 import PaywallPage from '@/components/taxsmart/PaywallPage';
+import PaymentReceipt, { PaymentReceiptData } from '@/components/taxsmart/PaymentReceipt';
 import Dashboard from '@/components/taxsmart/Dashboard';
 import { Sparkles } from 'lucide-react';
 import AnimatedBackground from '@/components/taxsmart/AnimatedBackground';
@@ -42,7 +43,7 @@ const defaultAdvanced: AdvancedProfile = {
   hasBusinessIncome: false, spouseIncome: 0,
 };
 
-type AppView = 'landing' | 'form' | 'paywall' | 'dashboard';
+type AppView = 'landing' | 'form' | 'paywall' | 'receipt' | 'dashboard';
 
 const Index = () => {
   const [step, setStep] = useState(0);
@@ -55,6 +56,7 @@ const Index = () => {
   const [financialYear, setFinancialYear] = useState<string>('2024-25');
   const [comparison, setComparison] = useState<TaxComparison | null>(null);
   const [strategies, setStrategies] = useState<Strategy[]>([]);
+  const [receipt, setReceipt] = useState<PaymentReceiptData | null>(null);
 
   const handleAnalyze = useCallback(() => {
     const comp = compareTaxRegimes(income, deductions, profile);
@@ -64,8 +66,9 @@ const Index = () => {
     setView('paywall');
   }, [income, deductions, profile, advanced, risk]);
 
-  const handleUnlock = useCallback(() => {
-    setView('dashboard');
+  const handleUnlock = useCallback((r: PaymentReceiptData) => {
+    setReceipt(r);
+    setView('receipt');
   }, []);
 
   return (
@@ -126,6 +129,10 @@ const Index = () => {
             onUnlock={handleUnlock}
             userName={profile.fullName}
           />
+        )}
+
+        {view === 'receipt' && receipt && (
+          <PaymentReceipt receipt={receipt} onContinue={() => setView('dashboard')} />
         )}
 
         {view === 'dashboard' && comparison && (

@@ -4,11 +4,12 @@ import { formatCurrency } from '@/lib/taxEngine';
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import type { PaymentReceiptData } from './PaymentReceipt';
 
 interface PaywallPageProps {
   comparison: TaxComparison;
   totalStrategies: number;
-  onUnlock: () => void;
+  onUnlock: (receipt: PaymentReceiptData) => void;
   userName?: string;
   userEmail?: string;
 }
@@ -61,8 +62,16 @@ const PaywallPage = ({ comparison, totalStrategies, onUnlock, userName, userEmai
               setLoading(false);
               return;
             }
-            toast({ title: 'Payment successful', description: 'Unlocking your full tax plan...' });
-            onUnlock();
+            toast({ title: 'Payment successful', description: 'Showing your receipt...' });
+            onUnlock({
+              orderId: response.razorpay_order_id,
+              paymentId: response.razorpay_payment_id,
+              amount: data.amount,
+              currency: data.currency,
+              paidAt: new Date(),
+              userName,
+              userEmail,
+            });
           } catch (e) {
             toast({ title: 'Verification error', description: (e as Error).message, variant: 'destructive' });
             setLoading(false);
