@@ -54,7 +54,7 @@ const PaywallPage = ({ comparison, totalStrategies, onUnlock, userName, userEmai
         handler: async (response: any) => {
           try {
             const { data: verify, error: verifyErr } = await supabase.functions.invoke('verify-razorpay-payment', {
-              body: response,
+              body: { ...response, userName, userEmail },
             });
             if (verifyErr || !verify?.valid) {
               toast({ title: 'Verification failed', description: 'Payment could not be verified. Contact support.', variant: 'destructive' });
