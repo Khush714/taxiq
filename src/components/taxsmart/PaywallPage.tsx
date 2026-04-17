@@ -51,7 +51,7 @@ const PaywallPage = ({ comparison, totalStrategies, onUnlock, userName, userEmai
         name: 'TaxSmart AI',
         description: 'Top 10 Tax-Saving Strategies Unlock',
         prefill: { name: userName || '', email: userEmail || '' },
-        theme: { color: '#D4AF37' },
+        theme: { color: '#0EA5E9' },
         handler: async (response: any) => {
           try {
             const { data: verify, error: verifyErr } = await supabase.functions.invoke('verify-razorpay-payment', {

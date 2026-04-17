@@ -15,51 +15,52 @@
     --popover: 220 18% 11%;
     --popover-foreground: 40 20% 95%;
 
-    --primary: 40 80% 55%;
-    --primary-foreground: 220 20% 7%;
+    --primary: 200 95% 50%;
+    --primary-foreground: 220 25% 8%;
 
     --secondary: 220 15% 16%;
-    --secondary-foreground: 40 20% 90%;
+    --secondary-foreground: 200 30% 92%;
 
     --muted: 220 15% 14%;
     --muted-foreground: 220 10% 55%;
 
-    --accent: 40 80% 55%;
-    --accent-foreground: 220 20% 7%;
+    --accent: 160 75% 45%;
+    --accent-foreground: 220 25% 8%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
     --border: 220 15% 18%;
     --input: 220 15% 18%;
-    --ring: 40 80% 55%;
+    --ring: 200 95% 50%;
 
     --radius: 0.75rem;
 
     --sidebar-background: 220 18% 9%;
-    --sidebar-foreground: 40 20% 90%;
-    --sidebar-primary: 40 80% 55%;
-    --sidebar-primary-foreground: 220 20% 7%;
+    --sidebar-foreground: 200 30% 92%;
+    --sidebar-primary: 200 95% 50%;
+    --sidebar-primary-foreground: 220 25% 8%;
     --sidebar-accent: 220 15% 14%;
-    --sidebar-accent-foreground: 40 20% 90%;
+    --sidebar-accent-foreground: 200 30% 92%;
     --sidebar-border: 220 15% 18%;
-    --sidebar-ring: 40 80% 55%;
+    --sidebar-ring: 200 95% 50%;
 
-    /* Custom tokens */
-    --gold: 40 80% 55%;
-    --gold-light: 40 70% 70%;
-    --gold-dark: 40 90% 40%;
+    /* Custom tokens — deep sky blue → emerald green palette
+       (kept under the same `gold` names so existing classes work) */
+    --gold: 200 95% 50%;
+    --gold-light: 180 80% 55%;
+    --gold-dark: 160 75% 42%;
     --surface: 220 18% 13%;
     --surface-hover: 220 18% 16%;
     --success: 152 60% 45%;
     --success-foreground: 152 60% 95%;
     --warning: 38 92% 50%;
-    --info: 210 80% 55%;
+    --info: 200 95% 55%;
 
-    --gradient-gold: linear-gradient(135deg, hsl(40 80% 55%), hsl(35 90% 45%));
+    --gradient-gold: linear-gradient(135deg, hsl(200 95% 50%), hsl(160 75% 45%));
     --gradient-surface: linear-gradient(180deg, hsl(220 18% 13%), hsl(220 20% 9%));
-    --gradient-hero: linear-gradient(135deg, hsl(220 20% 7%) 0%, hsl(220 25% 12%) 50%, hsl(220 20% 7%) 100%);
-    --shadow-gold: 0 4px 30px -5px hsl(40 80% 55% / 0.15);
+    --gradient-hero: linear-gradient(135deg, hsl(220 25% 8%) 0%, hsl(210 30% 12%) 50%, hsl(220 25% 8%) 100%);
+    --shadow-gold: 0 4px 30px -5px hsl(200 95% 50% / 0.25);
     --shadow-card: 0 4px 20px -5px hsl(0 0% 0% / 0.3);
   }
 }
@@ -85,7 +86,7 @@
   }
 
   .gold-gradient-text {
-    background: linear-gradient(135deg, hsl(40 80% 55%), hsl(35 70% 70%));
+    background: linear-gradient(135deg, hsl(200 95% 55%), hsl(160 75% 50%));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -106,12 +107,12 @@
   }
 
   .btn-gold {
-    background: linear-gradient(135deg, hsl(40 80% 55%), hsl(35 90% 45%));
+    background: linear-gradient(135deg, hsl(200 95% 50%), hsl(160 75% 45%));
     @apply text-background font-semibold rounded-lg px-6 py-3 transition-all duration-300;
   }
 
   .btn-gold:hover {
-    background: linear-gradient(135deg, hsl(40 80% 60%), hsl(35 90% 50%));
+    background: linear-gradient(135deg, hsl(200 95% 55%), hsl(160 75% 50%));
     box-shadow: var(--shadow-gold);
     transform: translateY(-1px);
   }
@@ -133,7 +134,7 @@
   }
 
   .step-indicator-active {
-    background: linear-gradient(135deg, hsl(40 80% 55%), hsl(35 90% 45%));
+    background: linear-gradient(135deg, hsl(200 95% 50%), hsl(160 75% 45%));
     @apply text-background;
   }
 
@@ -180,14 +181,14 @@
 }
 
 .shimmer {
-  background: linear-gradient(90deg, transparent 0%, hsl(40 80% 55% / 0.1) 50%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, hsl(200 95% 55% / 0.12) 50%, transparent 100%);
   background-size: 200% 100%;
   animation: shimmer 2s infinite;
 }
 
 @keyframes scoreGlow {
-  0%, 100% { text-shadow: 0 0 8px hsl(40 80% 55% / 0.15), 0 0 20px hsl(40 80% 55% / 0.05); }
-  50% { text-shadow: 0 0 16px hsl(40 80% 55% / 0.35), 0 0 40px hsl(40 80% 55% / 0.12); }
+  0%, 100% { text-shadow: 0 0 8px hsl(200 95% 55% / 0.18), 0 0 20px hsl(160 75% 50% / 0.08); }
+  50% { text-shadow: 0 0 16px hsl(200 95% 55% / 0.4), 0 0 40px hsl(160 75% 50% / 0.18); }
 }
 
 .animate-score-glow {

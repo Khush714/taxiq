@@ -14,7 +14,8 @@ export function generateTaxReport(
   const contentWidth = pageWidth - margin * 2;
   let y = 20;
 
-  const goldR = 200, goldG = 160, goldB = 60;
+  // Brand: deep sky blue (primary) for the PDF accents
+  const goldR = 14, goldG = 165, goldB = 233; // hsl(200 95% 50%) ≈ #0EA5E9
   const darkR = 18, darkG = 22, darkB = 30;
 
   // Header bar
