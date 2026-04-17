@@ -11,6 +11,7 @@ import DeductionsStep from '@/components/taxsmart/DeductionsStep';
 import AdvancedStep from '@/components/taxsmart/AdvancedStep';
 import RiskStep from '@/components/taxsmart/RiskStep';
 import PaywallPage from '@/components/taxsmart/PaywallPage';
+import PaymentReceipt, { PaymentReceiptData } from '@/components/taxsmart/PaymentReceipt';
 import Dashboard from '@/components/taxsmart/Dashboard';
 import { Sparkles } from 'lucide-react';
 import AnimatedBackground from '@/components/taxsmart/AnimatedBackground';
