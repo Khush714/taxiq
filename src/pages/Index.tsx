@@ -53,7 +53,14 @@ const Index = () => {
   const [deductions, setDeductions] = useState<DeductionDetails>(defaultDeductions);
   const [advanced, setAdvanced] = useState<AdvancedProfile>(defaultAdvanced);
   const [risk, setRisk] = useState<RiskPreference>('moderate');
-  const [financialYear, setFinancialYear] = useState<string>('2025-26');
+  const getCurrentFY = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth(); // 0 = Jan, 3 = Apr
+    const startYear = month >= 3 ? year : year - 1;
+    return `${startYear}-${String(startYear + 1).slice(-2)}`;
+  };
+  const [financialYear, setFinancialYear] = useState<string>(getCurrentFY());
   const [comparison, setComparison] = useState<TaxComparison | null>(null);
   const [strategies, setStrategies] = useState<Strategy[]>([]);
   const [receipt, setReceipt] = useState<PaymentReceiptData | null>(null);
