@@ -53,7 +53,7 @@ const Index = () => {
   const [deductions, setDeductions] = useState<DeductionDetails>(defaultDeductions);
   const [advanced, setAdvanced] = useState<AdvancedProfile>(defaultAdvanced);
   const [risk, setRisk] = useState<RiskPreference>('moderate');
-  const [financialYear, setFinancialYear] = useState<string>('2024-25');
+  const [financialYear, setFinancialYear] = useState<string>('2025-26');
   const [comparison, setComparison] = useState<TaxComparison | null>(null);
   const [strategies, setStrategies] = useState<Strategy[]>([]);
   const [receipt, setReceipt] = useState<PaymentReceiptData | null>(null);
