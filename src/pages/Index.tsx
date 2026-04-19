@@ -89,11 +89,14 @@ const Index = () => {
             <span className="font-serif font-bold text-foreground text-lg">TaxSmart <span className="gold-gradient-text">AI</span></span>
             <span className="text-[10px] text-muted-foreground ml-1 bg-secondary px-1.5 py-0.5 rounded">India</span>
           </div>
-          {view !== 'landing' && (
-            <span className="text-xs text-muted-foreground bg-secondary px-2 py-1 rounded">
-              FY {financialYear}
-            </span>
-          )}
+          <div className="flex items-center gap-3">
+            <a href="/blog" className="text-xs text-muted-foreground hover:text-primary transition-colors uppercase tracking-wider font-mono">Blog</a>
+            {view !== 'landing' && (
+              <span className="text-xs text-muted-foreground bg-secondary px-2 py-1 rounded">
+                FY {financialYear}
+              </span>
+            )}
+          </div>
         </div>
       </header>
 
